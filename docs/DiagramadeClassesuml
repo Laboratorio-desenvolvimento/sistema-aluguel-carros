@@ -1,0 +1,194 @@
+@startuml DiagramaDeClasses_AluguelCarros
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam packageFontSize 12
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam classBackgroundColor #F8F8F8
+skinparam classBorderColor #AAAAAA
+skinparam packageBackgroundColor #FAFAFA
+skinparam packageBorderColor #777777
+
+' ╔══════════════════════════════════════════════════════╗
+' ║   Subsistema 1 – Gestão de Pedidos e Contratos       ║
+' ╚══════════════════════════════════════════════════════╝
+package "Sistema para gestão de Pedidos e Contratos" {
+
+  ' ┌─────────────────────────────────────────┐
+  ' │  acesso                                 │
+  ' └─────────────────────────────────────────┘
+  package "acesso" {
+
+    abstract class UsuarioSistema {
+      - login: String
+      - senha: String
+      - nome: String
+      - endereco: String
+      + autenticar(): boolean
+    }
+
+    class Cliente {
+      - rg: String
+      - cpf: String
+      - profissao: String
+    }
+
+    abstract class Agente {
+      - cnpj: String
+    }
+
+    class Banco {
+    }
+
+    class Empresa {
+    }
+
+    class EntidadeEmpregadora {
+      - nome: String
+      - cnpj: String
+      - rendimento: Double
+    }
+
+    UsuarioSistema <|-- Cliente
+    UsuarioSistema <|-- Agente
+    Agente         <|-- Banco
+    Agente         <|-- Empresa
+
+    Cliente             "1"   *--  "1..3" EntidadeEmpregadora
+  }
+
+  ' ┌─────────────────────────────────────────┐
+  ' │  aluguel                                │
+  ' └─────────────────────────────────────────┘
+  package "aluguel" {
+
+    class PedidoAluguel {
+      - id: Long
+      - dataSolicitacao: Date
+      - status: StatusPedido
+      + getStatus(): StatusPedido
+      + setStatus(s: StatusPedido): void
+    }
+
+    enum StatusPedido {
+      INTRODUZIDO
+      EM_ANALISE
+      APROVADO
+      REJEITADO
+      CANCELADO
+    }
+
+    class Automovel {
+      - matricula: String
+      - ano: Integer
+      - marca: String
+      - modelo: String
+      - placa: String
+    }
+
+    PedidoAluguel --> StatusPedido
+    PedidoAluguel "1" --> "1" Automovel : refere-se a >
+
+  }
+
+  ' ┌─────────────────────────────────────────┐
+  ' │  financeiro                             │
+  ' └─────────────────────────────────────────┘
+  package "financeiro" {
+
+    class ContratoCredito {
+    }
+
+    ' Contrato de crédito concedido exclusivamente por banco agente
+    Banco "1" --> "0..*" ContratoCredito : concede >
+  }
+
+  ' ┌─────────────────────────────────────────┐
+  ' │  contratos                              │
+  ' └─────────────────────────────────────────┘
+  package "contratos" {
+
+    class Contrato {
+      - id: Long
+      - dataInicio: Date
+      - dataFim: Date
+      - valorTotal: Double
+      - tipoPropriedade: TipoPropriedade
+      + registrarPropriedade(): void
+    }
+
+    enum TipoPropriedade {
+      CLIENTE
+      EMPRESA
+      BANCO
+    }
+
+    Contrato --> TipoPropriedade
+
+    ' O contrato pertence ao agente que aprovou e executou
+    Agente        "1"    --> "0..*" Contrato       : executa/possui >
+
+    ' Pedido aprovado gera contrato
+    PedidoAluguel "1"    --> "0..1" Contrato       : gera >
+
+    ' Contrato pode estar associado a crédito concedido por banco
+    Contrato      "1"    --> "0..1" ContratoCredito : banco pode associar credito >
+
+    ' Automóvel registrado como propriedade no contrato
+    Contrato      "0..1" --> "1"    Automovel       : registra propriedade >
+  }
+
+  ' ┌─────────────────────────────────────────┐
+  ' │  controles                              │
+  ' └─────────────────────────────────────────┘
+  package "controles" {
+
+    class ControleCliente {
+      + introduzirPedido(c: Cliente): PedidoAluguel
+      + modificarPedido(p: PedidoAluguel): void
+      + consultarPedido(id: Long): PedidoAluguel
+      + cancelarPedido(p: PedidoAluguel): void
+    }
+
+    class ControleAgente {
+      + modificarPedido(p: PedidoAluguel): void
+      + analisarEExecutar(p: PedidoAluguel): Contrato
+      + rejeitarPedido(p: PedidoAluguel): void
+    }
+
+    ControleCliente --> Cliente        : controla >
+    ControleCliente --> PedidoAluguel  : gerencia >
+    ControleAgente  --> Agente         : controla >
+    ControleAgente  --> PedidoAluguel  : gerencia >
+    ControleAgente  --> Contrato       : executa >
+  }
+}
+
+' ╔══════════════════════════════════════════════════════╗
+' ║   Subsistema 2 – Construção de Páginas Web           ║
+' ╚══════════════════════════════════════════════════════╝
+package "Sistema para construção de Páginas Web" {
+
+  package "web" {
+
+    class MicronautView {
+    }
+  }
+}
+
+' ── Dependências entre subsistemas ───────────────────────
+MicronautView ..> ControleCliente : delega >
+MicronautView ..> ControleAgente  : delega >
+MicronautView ..> UsuarioSistema  : autentica >
+
+package "repository" {
+}
+    
+package "facade" {
+}
+    
+package "service" {
+}
+
+@enduml
