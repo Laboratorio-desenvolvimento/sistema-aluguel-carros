@@ -18,14 +18,112 @@ package "Sistema para gestão de Pedidos e Contratos" {
   ' ┌─────────────────────────────────────────┐
   ' │  acesso                                 │
   ' └─────────────────────────────────────────┘
-  package "acesso" {
+  
+  package "facade" {
+
+    class PedidoFacade {
+        + criarPedido(Cliente c, Veiculo v, Date inicio, Date fim) : HTTPResponse
+        + cancelarPedido(Pedido p) : HTTPResponse
+        + reprovarPedido(Pedido p) : HTTPResponse
+        + getPedidos(Usuario u) : Pedido[]
+        + executarPedido(Pedido p) : HTTPStatus
+    }
+     
+  }
+  
+  package "controller" {
+    
+    class ClienteController {
+        + getCliente(Long id) : Cliente
+        + criarCliente() : Cliente
+        + atualizarCliente(Cliente c) : Cliente
+        + removerCliente() : HTTPStatus
+    }
+    
+    class AgenteController {
+        + getAgente(Long id) : Agente
+        + criarAgente() : Agente
+        + atualizarAgente(Agente a) : Agente
+        + removerAgente() : HTTPStatus
+    }
+    
+    class VeiculoController {
+        + getVeiculos(Agente a) : Veiculo[]
+        + getVeiculos() : Veiculo[]
+        + getVeiculo(Long id) : Veiculo
+        + criarVeiculo(Veiculo v) : HTTPStatus
+        + atualizarVeiculo(Veiculo novoVeiculo) : Veiculo
+        + removerVeiculo(Veiculo novoVeiculo) : HTTPStatus
+        + calcularCusto(Veiculo v, Date inicio, Date fim) : HTTPStatus
+    }
+    
+    class PedidoController {
+        + getPedidos(Cliente c) : Pedido[]
+        + getPedidos(Agente a) : Pedido[]
+        + getPedido(Long id) : Pedido
+        + modificarPedido(Cliente c, Pedido p) : Pedido
+        + modificarPedido(Agente a, Pedido p) : Pedido
+        + criarPedido(Cliente c, Veiculo v, Date inicio, Date fim) : Pedido
+        + cancelarPedido(Pedido p) : Pedido
+        + executarPedido(Pedido p) : HTTPStatus
+        + reprovarPedido(Pedido p) : HTTPResponse
+    }
+    
+    class ContratoController {
+        + getContratos(Cliente c) : Contrato[]
+        + getContratos(Agente a) : Contrato[]
+        + getContrato(Long id) : Contrato
+        + criarContrato(Pedido p) : Contrato
+    }
+    
+  }
+
+package "repository" {
+
+ class ClienteRepository {
+    save()
+    delete()
+    update()
+    get()
+ }
+ 
+ class AgenteRepository {
+    save()
+    delete()
+    update()
+    get()
+ }
+ 
+ class VeiculoRepository {
+    save()
+    delete()
+    update()
+    get()
+ }
+ 
+ class PedidoRepository {
+    save()
+    delete()
+    update()
+    get()
+ }
+ 
+ class ContratoRepository {
+    save()
+    delete()
+    update()
+    get()
+ }
+ 
+}
+
+  package "model" {
 
     abstract class UsuarioSistema {
       - login: String
       - senha: String
       - nome: String
       - endereco: String
-      + autenticar(): boolean
     }
 
     class Cliente {
@@ -49,26 +147,25 @@ package "Sistema para gestão de Pedidos e Contratos" {
       - cnpj: String
       - rendimento: Double
     }
-
-    UsuarioSistema <|-- Cliente
-    UsuarioSistema <|-- Agente
-    Agente         <|-- Banco
-    Agente         <|-- Empresa
-
-    Cliente             "1"   *--  "1..3" EntidadeEmpregadora
-  }
-
-  ' ┌─────────────────────────────────────────┐
-  ' │  aluguel                                │
-  ' └─────────────────────────────────────────┘
-  package "aluguel" {
-
-    class PedidoAluguel {
+    
+    class Contrato {
+      - id: Long
+      - dataInicio: Date
+      - dataFim: Date
+      - valorTotal: Double
+      - tipoPropriedade: TipoPropriedade
+      - contratoCredito: ContratoCredito
+      - veiculo: Veiculo
+    }
+    
+    class Pedido {
       - id: Long
       - dataSolicitacao: Date
       - status: StatusPedido
-      + getStatus(): StatusPedido
-      + setStatus(s: StatusPedido): void
+      - contrato: Contrato
+    }
+    
+    class ContratoCredito {
     }
 
     enum StatusPedido {
@@ -79,7 +176,13 @@ package "Sistema para gestão de Pedidos e Contratos" {
       CANCELADO
     }
 
-    class Automovel {
+    enum TipoPropriedade {
+      CLIENTE
+      EMPRESA
+      BANCO
+    }
+    
+    class Veiculo {
       - matricula: String
       - ano: Integer
       - marca: String
@@ -87,42 +190,8 @@ package "Sistema para gestão de Pedidos e Contratos" {
       - placa: String
     }
 
-    PedidoAluguel --> StatusPedido
-    PedidoAluguel "1" --> "1" Automovel : refere-se a >
-
-  }
-
-  ' ┌─────────────────────────────────────────┐
-  ' │  financeiro                             │
-  ' └─────────────────────────────────────────┘
-  package "financeiro" {
-
-    class ContratoCredito {
-    }
-
-    ' Contrato de crédito concedido exclusivamente por banco agente
-    Banco "1" --> "0..*" ContratoCredito : concede >
-  }
-
-  ' ┌─────────────────────────────────────────┐
-  ' │  contratos                              │
-  ' └─────────────────────────────────────────┘
-  package "contratos" {
-
-    class Contrato {
-      - id: Long
-      - dataInicio: Date
-      - dataFim: Date
-      - valorTotal: Double
-      - tipoPropriedade: TipoPropriedade
-      + registrarPropriedade(): void
-    }
-
-    enum TipoPropriedade {
-      CLIENTE
-      EMPRESA
-      BANCO
-    }
+    Pedido --> StatusPedido
+    Pedido "1" --> "1" Veiculo : refere-se a >
 
     Contrato --> TipoPropriedade
 
@@ -130,38 +199,93 @@ package "Sistema para gestão de Pedidos e Contratos" {
     Agente        "1"    --> "0..*" Contrato       : executa/possui >
 
     ' Pedido aprovado gera contrato
-    PedidoAluguel "1"    --> "0..1" Contrato       : gera >
+    Pedido "1"    --> "0..1" Contrato       : gera >
 
     ' Contrato pode estar associado a crédito concedido por banco
     Contrato      "1"    --> "0..1" ContratoCredito : banco pode associar credito >
 
     ' Automóvel registrado como propriedade no contrato
-    Contrato      "0..1" --> "1"    Automovel       : registra propriedade >
+    Contrato      "0..1" --> "1"    Veiculo       : registra propriedade >
+    
+
+    UsuarioSistema <|-- Cliente
+    UsuarioSistema <|-- Agente
+    Agente         <|-- Banco
+    Agente         <|-- Empresa
+
+    Cliente             "1"   *--  "1..3" EntidadeEmpregadora
+    
+    Banco "1" --> "0..*" ContratoCredito : concede >
+    
   }
+
 
   ' ┌─────────────────────────────────────────┐
   ' │  controles                              │
   ' └─────────────────────────────────────────┘
-  package "controles" {
-
-    class ControleCliente {
-      + introduzirPedido(c: Cliente): PedidoAluguel
-      + modificarPedido(p: PedidoAluguel): void
-      + consultarPedido(id: Long): PedidoAluguel
-      + cancelarPedido(p: PedidoAluguel): void
+  package "services" {
+  
+    class ClienteService {
+        + getCliente(Long id) : Cliente
+        + criarCliente() : Cliente
+        + atualizarCliente(Cliente c) : Cliente
+        + removerCliente() : HTTPStatus
+    }
+    
+    class AgenteService {
+        + getAgente(Long id) : Agente
+        + criarAgente() : Agente
+        + atualizarAgente(Agente a) : Agente
+        + removerAgente() : HTTPStatus
+    }
+    
+    class VeiculoService {
+        + getVeiculos(Agente a) : Veiculo[]
+        + getVeiculos() : Veiculo[]
+        + getVeiculo(Long id) : Veiculo
+        + criarVeiculo(Veiculo v) : HTTPStatus
+        + atualizarVeiculo(Veiculo novoVeiculo) : Veiculo
+        + removerVeiculo(Veiculo novoVeiculo) : HTTPStatus
+        + calcularCusto(Veiculo v, Date inicio, Date fim) : HTTPStatus
+    }
+    
+    class PedidoService {
+        + getPedidos(Cliente c) : Pedido[]
+        + getPedidos(Agente a) : Pedido[]
+        + getPedido(Long id) : Pedido
+        + modificarPedido(Cliente c, Pedido p) : Pedido
+        + modificarPedido(Agente a, Pedido p) : Pedido
+        + criarPedido(Cliente c, Veiculo v, Date inicio, Date fim) : Pedido
+        + cancelarPedido(Pedido p) : Pedido
+        + executarPedido(Pedido p) : HTTPStatus
+        + reprovarPedido(Pedido p) : HTTPResponse
+    }
+    
+    class ContratoService {
+        + getContratos(Cliente c) : Contrato[]
+        + getContratos(Agente a) : Contrato[]
+        + getContrato(Long id) : Contrato
+        + criarContrato(Pedido p) : Contrato
     }
 
-    class ControleAgente {
-      + modificarPedido(p: PedidoAluguel): void
-      + analisarEExecutar(p: PedidoAluguel): Contrato
-      + rejeitarPedido(p: PedidoAluguel): void
-    }
+    ClienteController --> Pedido  : gerencia >
+    AgenteController  --> Pedido  : gerencia >
+    
+    ClienteController  --> ClienteService
+    AgenteController  --> AgenteService
+    VeiculoController  --> VeiculoService
+    
+    PedidoController  --> PedidoFacade
+    PedidoFacade  --> PedidoService
+    
+    ContratoController  --> ContratoService
+    
+    ClienteService  --> ClienteRepository
+    AgenteService  --> AgenteRepository
+    VeiculoService  --> VeiculoRepository
+    PedidoService  --> PedidoRepository
+    ContratoService  --> ContratoRepository
 
-    ControleCliente --> Cliente        : controla >
-    ControleCliente --> PedidoAluguel  : gerencia >
-    ControleAgente  --> Agente         : controla >
-    ControleAgente  --> PedidoAluguel  : gerencia >
-    ControleAgente  --> Contrato       : executa >
   }
 }
 
@@ -178,17 +302,11 @@ package "Sistema para construção de Páginas Web" {
 }
 
 ' ── Dependências entre subsistemas ───────────────────────
-MicronautView ..> ControleCliente : delega >
-MicronautView ..> ControleAgente  : delega >
+MicronautView ..> ClienteController : delega >
+MicronautView ..> AgenteController  : delega >
 MicronautView ..> UsuarioSistema  : autentica >
 
-package "repository" {
-}
+
     
-package "facade" {
-}
-    
-package "service" {
-}
 
 @enduml
