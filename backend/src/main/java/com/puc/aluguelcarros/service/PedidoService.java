@@ -149,4 +149,16 @@ public class PedidoService {
         pedido.setStatus(StatusPedido.REJECTED);
         return HttpResponse.ok(finalRepository.update(pedido));
     } 
+
+    public boolean verificarDisponibilidade(Veiculo veiculo, Date dataInicio, Date dataFim) {
+        List<Pedido> pedidos = finalRepository.findByVeiculoId(veiculo);
+        for (Pedido pedido : pedidos) {
+            if (pedido.getStatus() == StatusPedido.APPROVED || pedido.getStatus() == StatusPedido.UNDER_REVIEW) {
+                if (dataInicio.before(pedido.getDataFimDesejada()) && dataFim.after(pedido.getDataInicioDesejada())) {
+                    return false;
+                }
+            }
+        }
+        return true; 
+    }
 }

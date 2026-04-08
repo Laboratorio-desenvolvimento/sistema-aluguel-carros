@@ -19,5 +19,4 @@ public class Veiculo {
     private String modelo;
     @Column(unique = true)
     private String placa;
-    private boolean disponivel;
 }

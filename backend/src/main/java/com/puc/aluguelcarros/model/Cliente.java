@@ -9,18 +9,8 @@ import java.util.List;
 @Entity
 @Table(name = "cliente")
 @Data
-public class Cliente {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String nome;
-
-    @Column(unique = true)
-    private String email;
-
-    private String senha;
-
+@EqualsAndHashCode(callSuper = true)
+public class Cliente extends UsuarioSistema {
     @Column(unique = true)
     private String rg;
 
