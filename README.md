@@ -42,17 +42,46 @@ Desenvolver um software em Java utilizando Micronaut, para gerenciar pedidos e c
 
 ### Pre-requisitos
 
+- Java 21
+- Maven
+- Node.js 18+ e npm
+
+
 
 ### Passos
+
+1. Inicie o backend a partir da raiz do repositorio:
+
+	```bash
+	mvn -f backend/pom.xml mn:run
+	```
+
+2. Em outro terminal, inicie o frontend:
+
+	```bash
+	cd frontend
+	npm install
+	npm run dev
+	```
+
+3. Acesse a aplicacao no navegador:
+
+	- Frontend: http://localhost:5173
+	- Backend: http://localhost:8080
+
+
 
 
 ## Modelos UML
 
 ### Diagrama de Casos de Uso
-![Diagrama de Casos de Uso](docs/Diagrama-casos-de-uso.png)
+![Diagrama de Casos de Uso](docs/Diagrama-casos-de-uso-v3.png)
 
 ### Diagrama de Classes e Pacotes
 ![Diagrama de Classes e Pacotes](docs/uml_classes_pacotes.png)
+
+### Diagrama de Componentes
+![Diagrama de Componentes](docs/componentes.png)
 
 ## Integrantes
 
