@@ -87,7 +87,7 @@ export default function CadastroCliente() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/cliente", {
+      const response = await fetch("/api/cliente", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -238,7 +238,10 @@ export default function CadastroCliente() {
 
         <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
           <p>
-            Já tem cadastro? <a href="/" className="text-blue-600 dark:text-blue-400 hover:underline">Voltar para home</a>
+            Já tem cadastro? <a href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">Faça login</a>
+          </p>
+          <p className="mt-2">
+            <a href="/" className="text-blue-600 dark:text-blue-400 hover:underline">Voltar para home</a>
           </p>
         </div>
       </div>

@@ -22,18 +22,36 @@ Desenvolver um software em Java utilizando Micronaut, para gerenciar pedidos e c
 
 ## Tecnologias Utilizadas
 
-- **Java**: 
-- **Micronaut**: 
+- **Java**: 21
+- **Micronaut**: 4.x
+- **Maven**: build e execucao do backend
+- **React**: 19
+- **React Router**: 7
+- **Vite**: 7
+- **Node.js + npm**: build e execucao do frontend
 
 ## Dependencias
+
+- Backend: gerenciadas pelo `Maven` no arquivo `backend/pom.xml`
+- Frontend: gerenciadas pelo `npm` no arquivo `frontend/package.json`
 
 
 ## 📂 Estrutura de Pastas
 ```
 /
+├── backend/
+│   ├── src/
+│   ├── pom.xml
+│   └── README.md
 ├── docs/
-│   ├── Diagrama-casos-de-uso.png
+│   ├── Diagrama-casos-de-uso-v3.png
+│   ├── Diagrama de componentes.png
 │   └── uml_classes_pacotes.png
+├── frontend/
+│   ├── app/
+│   ├── public/
+│   ├── package.json
+│   └── README.md
 └── README.md
 ```
 
@@ -81,7 +99,7 @@ Desenvolver um software em Java utilizando Micronaut, para gerenciar pedidos e c
 ![Diagrama de Classes e Pacotes](docs/uml_classes_pacotes.png)
 
 ### Diagrama de Componentes
-![Diagrama de Componentes](docs/componentes.png)
+![Diagrama de Componentes](docs/Diagrama de componentes.png)
 
 ## Integrantes
 

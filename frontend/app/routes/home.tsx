@@ -18,6 +18,9 @@ export default function Home() {
               <a href="/" className="text-gray-700 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400 font-medium">
                 Home
               </a>
+              <a href="/login" className="text-gray-700 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400 font-medium">
+                Login
+              </a>
               <a href="/cadastro-cliente" className="text-gray-700 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400 font-medium">
                 Cadastro
               </a>
@@ -73,6 +76,12 @@ export default function Home() {
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200"
             >
               Comece seu Cadastro Agora
+            </a>
+            <a
+              href="/login"
+              className="inline-block ml-4 mt-4 sm:mt-0 bg-white hover:bg-gray-50 text-blue-700 font-bold py-3 px-8 rounded-lg border border-blue-200 transition-colors duration-200"
+            >
+              Já tenho conta
             </a>
           </div>
         </div>
