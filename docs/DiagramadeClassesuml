@@ -124,6 +124,7 @@ package "repository" {
       - senha: String
       - nome: String
       - endereco: String
+      - email: String
     }
 
     class Cliente {
@@ -163,6 +164,7 @@ package "repository" {
       - dataSolicitacao: Date
       - status: StatusPedido
       - contrato: Contrato
+      - agente: Agente
     }
     
     class ContratoCredito {

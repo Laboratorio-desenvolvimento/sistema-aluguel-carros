@@ -30,7 +30,7 @@ public class PedidoService {
     }
 
     public List<Pedido> getPedidosByAgente(Agente agente){
-        List<Pedido> pedidos = finalRepository.findByContratoAgente(agente);
+        List<Pedido> pedidos = finalRepository.findByAgente(agente);
         if(pedidos.isEmpty()){
             throw new PersistenceException("Nenhum pedido encontrado para o agente: " + agente.getNome());
         }
@@ -151,7 +151,7 @@ public class PedidoService {
     } 
 
     public boolean verificarDisponibilidade(Veiculo veiculo, Date dataInicio, Date dataFim) {
-        List<Pedido> pedidos = finalRepository.findByVeiculoId(veiculo);
+        List<Pedido> pedidos = finalRepository.findByVeiculo(veiculo);
         for (Pedido pedido : pedidos) {
             if (pedido.getStatus() == StatusPedido.APPROVED || pedido.getStatus() == StatusPedido.UNDER_REVIEW) {
                 if (dataInicio.before(pedido.getDataFimDesejada()) && dataFim.after(pedido.getDataInicioDesejada())) {

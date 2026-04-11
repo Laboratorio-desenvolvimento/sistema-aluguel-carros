@@ -13,7 +13,7 @@ public interface PedidoRepository extends CrudRepository<Pedido, Long>{
     Optional<Pedido> findById(Long id);
     Optional<Pedido> findByIdAndCliente(Long id, Cliente cliente);
     Optional<Pedido> findByIdAndAgente(Long id, Agente agente);
-    List<Pedido> findByVeiculoId(Veiculo veiculo);
+    List<Pedido> findByVeiculo(Veiculo veiculo);
     List<Pedido> findByCliente(Cliente cliente);
-    List<Pedido> findByContratoAgente(Agente agente);
+    List<Pedido> findByAgente(Agente agente);
 }

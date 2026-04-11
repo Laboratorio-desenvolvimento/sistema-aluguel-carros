@@ -25,6 +25,9 @@ public class Pedido{
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
     @ManyToOne
+    @JoinColumn(name = "agente_id")
+    private Agente agente;
+    @ManyToOne
     @JoinColumn(name = "veiculo_id")
     private Veiculo veiculo;
 }

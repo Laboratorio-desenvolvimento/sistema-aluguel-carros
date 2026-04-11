@@ -17,4 +17,6 @@ public class UsuarioSistema {
     private String senha;
     private String nome;
     private String endereco;
+    @Column(unique = true)
+    private String email;
 }
