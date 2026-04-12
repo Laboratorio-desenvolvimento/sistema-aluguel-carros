@@ -2,10 +2,10 @@ import { useState } from "react";
 import type { Route } from "./+types/cadastro-cliente";
 import Navbar from "~/components/navbar";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
-    { title: "Cadastro de Cliente" },
-    { name: "description", content: "Formulário de cadastro de novo cliente" },
+    { title: "Cadastro de Cliente - VrumVrum" },
+    { name: "description", content: "Cadastre-se no VrumVrum e aproveite nossas ofertas" },
   ];
 }
 
@@ -119,8 +119,8 @@ export default function CadastroCliente() {
   };
 
   return (
-
-      <div className="mx-auto max-w-md bg-white dark:bg-slate-900 dark:ring-1 dark:ring-slate-700 rounded-lg shadow-md p-8">
+    <div className="flex-1 flex items-center justify-center p-4 min-h-[calc(100vh-75px)] py-12">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 dark:ring-1 dark:ring-slate-700 rounded-lg shadow-md p-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8 text-center">
           Cadastro de Cliente
         </h1>
@@ -148,7 +148,7 @@ export default function CadastroCliente() {
               name="nome"
               value={formData.nome}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               placeholder="Digite seu nome completo"
             />
           </div>
@@ -163,7 +163,7 @@ export default function CadastroCliente() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               placeholder="seu.email@exemplo.com"
             />
           </div>
@@ -178,7 +178,7 @@ export default function CadastroCliente() {
               name="cpf"
               value={formData.cpf}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               placeholder="000.000.000-00"
             />
           </div>
@@ -193,7 +193,7 @@ export default function CadastroCliente() {
               name="rg"
               value={formData.rg}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               placeholder="Digite sua inscrição estadual"
             />
           </div>
@@ -208,7 +208,7 @@ export default function CadastroCliente() {
               name="profissao"
               value={formData.profissao}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               placeholder="Sua profissão"
             />
           </div>
@@ -223,7 +223,7 @@ export default function CadastroCliente() {
               name="senha"
               value={formData.senha}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               placeholder="Mínimo 6 caracteres"
             />
           </div>
@@ -231,7 +231,7 @@ export default function CadastroCliente() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+            className="w-full mt-6 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-black font-bold py-2 px-4 rounded-md transition-colors duration-200"
           >
             {loading ? "Cadastrando..." : "Cadastrar"}
           </button>
@@ -239,12 +239,15 @@ export default function CadastroCliente() {
 
         <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
           <p>
-            Já tem cadastro? <a href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">Faça login</a>
+            Já tem cadastro? <a href="/login" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline">Faça login</a>
           </p>
-          <p className="mt-2">
-            <a href="/" className="text-blue-600 dark:text-blue-400 hover:underline">Voltar para home</a>
+          <p className="mt-2 text-center flex justify-center">
+            <a href="/" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline inline-flex items-center gap-1">
+              <span>🏠</span> Voltar para home
+            </a>
           </p>
         </div>
       </div>
+    </div>
   );
 }

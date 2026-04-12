@@ -2,10 +2,10 @@ import { useState } from "react";
 import type { Route } from "./+types/login";
 import Navbar from "~/components/navbar";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
-    { title: "Login" },
-    { name: "description", content: "Acesse sua conta no sistema de aluguel de carros" },
+    { title: "Login - VrumVrum" },
+    { name: "description", content: "Acesse sua conta no VrumVrum" },
   ];
 }
 
@@ -85,7 +85,8 @@ export default function Login() {
   };
 
   return (
-      <div className="mx-auto max-w-md bg-white dark:bg-slate-900 dark:ring-1 dark:ring-slate-700 rounded-lg shadow-md p-8">
+    <div className="flex-1 flex items-center justify-center p-4 min-h-[calc(100vh-75px)]">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 dark:ring-1 dark:ring-slate-700 rounded-lg shadow-md p-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8 text-center">
           Login
         </h1>
@@ -113,7 +114,7 @@ export default function Login() {
               name="email"
               value={loginData.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               placeholder="seu.email@exemplo.com"
             />
           </div>
@@ -128,7 +129,7 @@ export default function Login() {
               name="senha"
               value={loginData.senha}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               placeholder="Digite sua senha"
             />
           </div>
@@ -136,7 +137,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+            className="w-full mt-6 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-black font-bold py-2 px-4 rounded-md transition-colors duration-200"
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>
@@ -144,12 +145,15 @@ export default function Login() {
 
         <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
           <p>
-            Ainda não tem conta? <a href="/cadastro-cliente" className="text-blue-600 dark:text-blue-400 hover:underline">Cadastre-se</a>
+            Ainda não tem conta? <a href="/cadastro-cliente" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline">Cadastre-se</a>
           </p>
-          <p className="mt-2">
-            <a href="/" className="text-blue-600 dark:text-blue-400 hover:underline">Voltar para home</a>
+          <p className="mt-2 text-center flex justify-center">
+            <a href="/" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline inline-flex items-center gap-1">
+              <span>🏠</span> Voltar para home
+            </a>
           </p>
         </div>
       </div>
+    </div>
   );
 }
