@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Route } from "./+types/cadastro-cliente";
+import Navbar from "~/components/navbar";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -118,7 +119,7 @@ export default function CadastroCliente() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
+
       <div className="mx-auto max-w-md bg-white dark:bg-slate-900 dark:ring-1 dark:ring-slate-700 rounded-lg shadow-md p-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8 text-center">
           Cadastro de Cliente
@@ -245,6 +246,5 @@ export default function CadastroCliente() {
           </p>
         </div>
       </div>
-    </div>
   );
 }
