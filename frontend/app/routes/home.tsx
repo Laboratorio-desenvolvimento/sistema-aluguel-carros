@@ -12,7 +12,11 @@ export default function Home() {
   return (
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
+        <div className="text-center justify-center items-center">
+          <div className="mx-auto bg-[#0D1B3E] border rounded-full border-[#2D5BE3] w-80 ">
+            <span className="w-2 h-2 rounded-full bg-red-900"></span>
+            <p className="text-[#2563EB] dark:text-[#D6E4FF]">O futuro do aluguel de carros</p>
+          </div>
           <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Bem-vindo ao Sistema de Aluguel de Carros
           </h2>
