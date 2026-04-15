@@ -49,6 +49,11 @@ public class ClienteService {
         clienteRepository.delete(cliente);
     }
 
+    public Cliente buscarPorId(Long id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
+    }
+
     private List<EntidadeEmpregadora> resolverEmpregadoras(List<EntidadeEmpregadora> empregadoras) {
         if (empregadoras == null) return null;
         return empregadoras.stream()

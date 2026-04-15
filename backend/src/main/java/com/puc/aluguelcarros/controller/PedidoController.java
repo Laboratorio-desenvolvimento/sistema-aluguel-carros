@@ -1,19 +1,20 @@
 package com.puc.aluguelcarros.controller;
 import com.puc.aluguelcarros.model.Pedido;
-import com.puc.aluguelcarros.facade.PedidoFacace;
+import com.puc.aluguelcarros.facade.PedidoFacade;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
 import java.util.List;
 
 @Controller("/pedidos")
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class PedidoController {
-    private final PedidoFacace pedidoFacace;
+    private final PedidoFacade pedidoFacace;
     
-    public PedidoController(PedidoFacace pedidoFacace) {
+    public PedidoController(PedidoFacade pedidoFacace) {
         this.pedidoFacace = pedidoFacace;
     }
 
@@ -42,6 +43,25 @@ public class PedidoController {
         }
 
         return pedidoFacace.criarPedido(pedido);
+    }
+
+    @Get("/cliente")
+    @Secured(SecurityRule.IS_AUTHENTICATED)
+    @Status(HttpStatus.OK)
+    public HttpResponse<List<Pedido>> listarPedidosCliente(Authentication authentication) {
+        try {
+            Object userId = authentication.getAttributes().get("userId");
+            if (userId == null) {
+                return HttpResponse.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+            Long clienteId = Long.parseLong(userId.toString());
+            List<Pedido> pedidos = pedidoFacace.listarPedidosCliente(clienteId);
+            return HttpResponse.ok(pedidos);
+        } catch (NumberFormatException e) {
+            return HttpResponse.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception e) {
+            return HttpResponse.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @Put("/cancelar")

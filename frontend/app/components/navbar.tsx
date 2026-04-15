@@ -65,6 +65,9 @@ export default function Navbar() {
 
                             {user ? (
                                 <>
+                                    <a href="/reservas-cliente" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
+                                        Pedidos
+                                    </a>
                                     <span className="text-yellow-600 dark:text-yellow-500 font-bold tracking-widest text-sm border-l border-gray-300 dark:border-slate-700 pl-8">
                                         Olá, {user.nome.split(" ")[0]}
                                     </span>

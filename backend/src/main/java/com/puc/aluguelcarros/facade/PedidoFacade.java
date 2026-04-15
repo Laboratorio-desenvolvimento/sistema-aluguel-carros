@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 @Singleton
-public class PedidoFacace {
+public class PedidoFacade {
     @Inject
     private PedidoService pedidoService;
     
@@ -32,6 +32,15 @@ public class PedidoFacace {
             return HttpResponse.ok(pedidos);
         } catch (Exception e) {
             return HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    public List<Pedido> listarPedidosCliente(Long clienteId) {
+        try {
+            List<Pedido> pedidos = pedidoService.getPedidosByClients(clienteService.buscarPorId(clienteId));
+            return pedidos;
+        } catch (Exception e) {
+            return new ArrayList<>();
         }
     }
 
