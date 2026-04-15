@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 import Navbar from "~/components/navbar";
+import { Zap, FileCheck, LayoutDashboard, Car, Briefcase } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -29,16 +30,16 @@ export default function Home() {
 
           <div className="mt-12">
             <a
-              href="/cadastro-cliente"
-              className="inline-block bg-yellow-300 hover:bg-yellow-400 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200"
+              href="/cadastro"
+              className="inline-flex items-center gap-2 bg-yellow-300 hover:bg-yellow-400 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200"
             >
-              Quero Alugar
+              <Car size={18} /> Quero Alugar
             </a>
             <a
-              href=""
-              className="inline-block ml-4 mt-4 sm:mt-0 font-bold py-3 px-8 rounded-lg  border border-yellow-400 text-yellow-400 bg-transparent transition-colors duration-200"
+              href="/cadastro"
+              className="inline-flex items-center gap-2 ml-4 mt-4 sm:mt-0 font-bold py-3 px-8 rounded-lg border border-yellow-400 text-yellow-400 bg-transparent transition-colors duration-200"
             >
-              Sou um agente
+              <Briefcase size={18} /> Sou um agente
             </a>
           </div>
         </div>
@@ -47,17 +48,17 @@ export default function Home() {
           <p>Nossa plataforma foi desenhada para eliminar o atrito entre você e o seu próximo destino.</p>
           <div className="mt-15 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
             <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition duration-300 ">
-              <div className="icon">⚡</div>
+              <div className="mb-3"><Zap size={28} className="text-yellow-500" /></div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Aprovação Imediata</h3>
               <p className="text-gray-900">Análise de crédito e aprovação em tempo real. Não perca tempo em filas de locadoras.</p>
             </div>
             <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition duration-300">
-              <div className="icon">⚡</div>
+              <div className="mb-3"><FileCheck size={28} className="text-yellow-500" /></div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Contratos Seguros</h3>
               <p className="text-gray-900">Assinatura digital com validade jurídica. Transparência total nas condições e valores.</p>
             </div>
             <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition duration-300">
-              <div className="icon">⚡</div>
+              <div className="mb-3"><LayoutDashboard size={28} className="text-yellow-500" /></div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Gestão Completa</h3>
               <p className="text-gray-900">Acompanhe seus prazos, renove contratos e gerencie seus aluguéis direto pelo celular.</p>
             </div>

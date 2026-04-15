@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Route } from "./+types/login";
 import Navbar from "~/components/navbar";
+import { Home } from "lucide-react";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -145,11 +146,11 @@ export default function Login() {
 
         <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
           <p>
-            Ainda não tem conta? <a href="/cadastro-cliente" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline">Cadastre-se</a>
+            Ainda não tem conta? <a href="/cadastro" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline">Cadastre-se</a>
           </p>
           <p className="mt-2 text-center flex justify-center">
             <a href="/" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline inline-flex items-center gap-1">
-              <span>🏠</span> Voltar para home
+              <Home size={14} /> Voltar para home
             </a>
           </p>
         </div>
