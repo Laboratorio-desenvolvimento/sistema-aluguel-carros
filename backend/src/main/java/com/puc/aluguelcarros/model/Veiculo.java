@@ -1,4 +1,5 @@
 package com.puc.aluguelcarros.model;
+
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,4 +20,23 @@ public class Veiculo {
     private String modelo;
     @Column(unique = true)
     private String placa;
+    @Column(name = "valor_dia")
+    private Double valorDia;
+
+    private String categoria;
+    private String combustivel;
+    private Integer lugares;
+    private String potencia;
+    private Double avaliacao;
+    private Boolean destaque;
+    
+    @Column(length = 500)
+    private String itens; // Itens extras, exemplo: "Ar-condicionado,Wi-Fi,Seguro incluso"
+    
+    @Column(columnDefinition = "TEXT")
+    private String foto;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "agente_id")
+    private Agente agente;
 }

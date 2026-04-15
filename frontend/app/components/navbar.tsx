@@ -44,9 +44,15 @@ export default function Navbar() {
                             <a href="/" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
                                 Início
                             </a>
+
+                            <a href="/veiculos" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
+                                Veículos
+                            </a>
+
                             <a href="/login" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
                                 Login
                             </a>
+
                             <a href="/cadastro" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
                                 Cadastro
                             </a>

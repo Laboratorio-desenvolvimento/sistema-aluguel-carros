@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Route } from "./+types/login";
 import Navbar from "~/components/navbar";
 import { Home } from "lucide-react";
@@ -30,6 +30,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [redirectTo, setRedirectTo] = useState("/");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect");
+    if (redirect) setRedirectTo(redirect);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -76,8 +83,10 @@ export default function Login() {
       }
 
       const payload = (await response.json()) as LoginResponse;
-      setSuccessMessage(`${payload.mensagem} Bem-vindo(a), ${payload.nome}.`);
+      localStorage.setItem("vrumvrum_usuario", JSON.stringify({ id: payload.id, nome: payload.nome, email: payload.email }));
+      setSuccessMessage(`Bem-vindo(a), ${payload.nome}! Redirecionando...`);
       setLoginData({ email: "", senha: "" });
+      setTimeout(() => { window.location.href = redirectTo; }, 1200);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Erro inesperado.");
     } finally {

@@ -78,10 +78,10 @@ public class ClienteService {
 
     public Cliente autenticar(String email, String senha) {
         Cliente cliente = clienteRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Credenciais inválidas."));
+                .orElseThrow(() -> new RuntimeException("Email ou senha inválidos."));
 
         if (!passwordEncoder.matches(senha, cliente.getSenha())) {
-            throw new RuntimeException("Credenciais inválidas.");
+            throw new RuntimeException("Email ou senha inválidos.");
         }
 
         return cliente;
