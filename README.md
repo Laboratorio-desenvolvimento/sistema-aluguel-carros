@@ -39,21 +39,34 @@ Desenvolver um software em Java utilizando Micronaut, para gerenciar pedidos e c
 ## 📂 Estrutura de Pastas
 ```
 /
-├── backend/
+├── backend/                   # Backend Micronaut (Java)
 │   ├── src/
-│   ├── pom.xml
-│   └── README.md
-├── docs/
-│   ├── Diagrama-casos-de-uso-v3.png
-│   ├── Diagrama de componentes.png
-│   └── uml_classes_pacotes.png
-├── frontend/
+│   │   ├── main/
+│   │   │   ├── java/com/puc/aluguelcarros/
+│   │   │   │   ├── configuration/  # Configurações do framework
+│   │   │   │   ├── controller/     # Endpoints da API REST
+│   │   │   │   ├── enums/          # Tipos enumerados
+│   │   │   │   ├── facade/         # Fachadas para simplificação de lógica
+│   │   │   │   ├── model/          # Entidades de domínio
+│   │   │   │   ├── repository/     # Acesso a dados
+│   │   │   │   ├── service/        # Lógica de negócio e serviços
+│   │   │   │   └── Application.java # Ponto de entrada
+│   │   │   └── resources/          # Configurações (application.yml)
+│   └─  pom.xml                # Gerenciador de dependências Maven
+├── frontend/                  # Frontend React Router (Vite)
 │   ├── app/
-│   ├── public/
-│   ├── package.json
-│   └── README.md
-└── README.md
+│   │   ├── components/        # Componentes UI reutilizáveis
+│   │   ├── routes/            # Definição de rotas e páginas
+│   │   ├── services/          # Serviços de API e autenticação
+│   │   ├── welcome/           # Componentes de boas-vindas
+│   │   └── root.tsx           # Layout principal da aplicação
+│   ├── public/                # Ativos estáticos (imagens, ícones)
+│   ├── package.json           # Dependências e scripts npm
+│   └── vite.config.ts         # Configuração do Vite
+├── docs/                      # Documentação UML e diagramas
+└── README.md                  # Documentação principal do projeto
 ```
+
 
 
 ## Instalacao e Execucao
@@ -99,7 +112,7 @@ Desenvolver um software em Java utilizando Micronaut, para gerenciar pedidos e c
 ![Diagrama de Classes e Pacotes](docs/uml_classes_pacotes.png)
 
 ### Diagrama de Componentes
-![Diagrama de Componentes](docs/Diagrama de componentes.png)
+![Diagrama de Componentes](docs/Diagrama_de_componentes.png)
 
 ## Integrantes
 
