@@ -46,6 +46,7 @@ Desenvolver um software em Java utilizando Micronaut, para gerenciar pedidos e c
 ├── docs/
 │   ├── Diagrama-casos-de-uso-v3.png
 │   ├── Diagrama de componentes.png
+│   ├── Diagrama-de-implantação.png
 │   └── uml_classes_pacotes.png
 ├── frontend/
 │   ├── app/
@@ -99,7 +100,10 @@ Desenvolver um software em Java utilizando Micronaut, para gerenciar pedidos e c
 ![Diagrama de Classes e Pacotes](docs/uml_classes_pacotes.png)
 
 ### Diagrama de Componentes
-![Diagrama de Componentes](docs/Diagrama de componentes.png)
+![Diagrama de Componentes](docs/Diagrama%20de%20componentes.png)
+
+### Diagrama de Implantacao (Producao)
+[Arquivo PlantUML do Diagrama de Implantacao](docs/Diagrama-de-Implantação.png)
 
 ## Integrantes
 
