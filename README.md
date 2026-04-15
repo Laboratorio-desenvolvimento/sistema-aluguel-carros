@@ -102,8 +102,8 @@ Desenvolver um software em Java utilizando Micronaut, para gerenciar pedidos e c
 ### Diagrama de Componentes
 ![Diagrama de Componentes](docs/Diagrama%20de%20componentes.png)
 
-### Diagrama de Implantacao (Producao)
-[Arquivo PlantUML do Diagrama de Implantacao](docs/Diagrama-de-Implantação.png)
+### Diagrama de Implantação
+![Diagrama de Implantação](docs/Diagrama-de-Implantação.png)
 
 ## Integrantes
 
