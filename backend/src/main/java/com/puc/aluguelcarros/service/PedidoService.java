@@ -21,6 +21,10 @@ public class PedidoService {
         this.finalRepository = repository;
     }
 
+    public List<Pedido> listarTodos() {
+        return finalRepository.findAll();
+    }
+
     public List<Pedido> getPedidosByClients(Cliente cliente){
         List<Pedido> pedidos = finalRepository.findByCliente(cliente);
         if(pedidos.isEmpty()){

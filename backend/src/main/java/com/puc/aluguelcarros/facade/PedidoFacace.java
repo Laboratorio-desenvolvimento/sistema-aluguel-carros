@@ -4,6 +4,8 @@ import com.puc.aluguelcarros.model.Cliente;
 import com.puc.aluguelcarros.model.Pedido;
 import com.puc.aluguelcarros.model.UsuarioSistema;
 import com.puc.aluguelcarros.service.PedidoService;
+import com.puc.aluguelcarros.service.ClienteService;
+import com.puc.aluguelcarros.service.VeiculoService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import jakarta.inject.Inject;
@@ -17,19 +19,47 @@ import java.util.ArrayList;
 public class PedidoFacace {
     @Inject
     private PedidoService pedidoService;
+    
+    @Inject
+    private ClienteService clienteService;
+    
+    @Inject
+    private VeiculoService veiculoService;
+
+    public HttpResponse<List<Pedido>> listarTodos() {
+        try {
+            List<Pedido> pedidos = pedidoService.listarTodos();
+            return HttpResponse.ok(pedidos);
+        } catch (Exception e) {
+            return HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
     public HttpResponse<Pedido> criarPedido(Pedido pedido) {
         try {
+            // Buscar cliente completo pelo ID
+            Cliente cliente = clienteService.listarTodos().stream()
+                .filter(c -> c.getId().equals(pedido.getCliente().getId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+            
+            // Buscar veículo completo pelo ID
+            var veiculo = veiculoService.listarTodos().stream()
+                .filter(v -> v.getId().equals(pedido.getVeiculo().getId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
+
             // Verificar se o carro está disponível para as datas solicitadas
-            boolean isDisponivel = pedidoService.verificarDisponibilidade(pedido.getVeiculo(), pedido.getDataInicioDesejada(), pedido.getDataFimDesejada());
+            boolean isDisponivel = pedidoService.verificarDisponibilidade(veiculo, pedido.getDataInicioDesejada(), pedido.getDataFimDesejada());
             if (!isDisponivel) {
                 return HttpResponse.status(HttpStatus.CONFLICT).body(null);
             }
 
             // Criar o pedido
-            Pedido novoPedido = pedidoService.criarPedido(pedido.getCliente(), pedido.getVeiculo(), pedido.getDataInicioDesejada(), pedido.getDataFimDesejada());
+            Pedido novoPedido = pedidoService.criarPedido(cliente, veiculo, pedido.getDataInicioDesejada(), pedido.getDataFimDesejada());
             return HttpResponse.status(HttpStatus.CREATED).body(novoPedido);
         } catch (Exception e) {
+            e.printStackTrace();
             return HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

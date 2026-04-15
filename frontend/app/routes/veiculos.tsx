@@ -49,6 +49,10 @@ export default function Veiculos() {
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalAberto, setModalAberto] = useState(false);
+  const [veiculoSelecionado, setVeiculoSelecionado] = useState<Veiculo | null>(null);
+  const [dataInicial, setDataInicial] = useState("");
+  const [dataFinal, setDataFinal] = useState("");
 
   useEffect(() => {
     const usuario = localStorage.getItem("vrumvrum_usuario");
@@ -66,15 +70,83 @@ export default function Veiculos() {
       });
   }, []);
 
-  const handleReservar = () => {
+  const handleReservar = (veiculo: Veiculo) => {
     if (!autenticado) {
       window.location.href = "/login?redirect=/veiculos";
       return;
     }
 
-    // Fazer reserva
+    setVeiculoSelecionado(veiculo);
+    setModalAberto(true);
+    setDataInicial("");
+    setDataFinal("");
+  };
 
-    alert("Iniciando reserva do veículo!");
+  const handleConfirmarReserva = async () => {
+    if (!dataInicial || !dataFinal) {
+      alert("Por favor, preencha as datas!");
+      return;
+    }
+
+    if (new Date(dataInicial) >= new Date(dataFinal)) {
+      alert("A data final deve ser posterior à data inicial!");
+      return;
+    }
+
+    try {
+      const usuarioJSON = localStorage.getItem("vrumvrum_usuario");
+      const usuario = usuarioJSON ? JSON.parse(usuarioJSON) : null;
+
+      if (!usuario) {
+        alert("Por favor, faça login para realizar a reserva.");
+        window.location.href = "/login?redirect=/veiculos";
+        return;
+      }
+
+      const reserva = {
+        cliente: {
+          id: usuario.id,
+        },
+        veiculo: {
+          id: veiculoSelecionado?.id,
+        },
+        dataInicioDesejada: new Date(dataInicial).toISOString(),
+        dataFimDesejada: new Date(dataFinal).toISOString(),
+        dataSolicitacao: new Date().toISOString(),
+        status: "INTRODUCED",
+      };
+
+      console.log("Enviando reserva:", reserva);
+
+      const resposta = await fetch("/api/pedidos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reserva),
+      });
+
+      if (resposta.ok) {
+        const pedidoCriado = await resposta.json();
+        alert("Reserva criada com sucesso!");
+        console.log("Pedido criado:", pedidoCriado);
+        setModalAberto(false);
+      } else if (resposta.status === 409) {
+        alert("Veículo não está disponível para as datas selecionadas!");
+      } else {
+        const errorText = await resposta.text();
+        console.error("Erro do servidor:", errorText);
+        alert(`Erro ao criar reserva: ${resposta.status} - ${errorText}`);
+      }
+    } catch (erro) {
+      console.error("Erro ao enviar reserva:", erro);
+      alert("Erro de conexão. Verifique sua conexão com o servidor.");
+    }
+  };
+
+  const handleFecharModal = () => {
+    setModalAberto(false);
+    setVeiculoSelecionado(null);
   };
 
 
@@ -94,6 +166,113 @@ export default function Veiculos() {
 
   return (
     <div className="flex-1 min-h-[calc(100vh-75px)] bg-slate-950/90 backdrop-blur-md py-10 px-4">
+      {/* Modal de Reserva */}
+      {modalAberto && veiculoSelecionado && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 rounded-2xl border border-slate-700 shadow-2xl max-w-md w-full">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 p-6 rounded-t-2xl">
+              <h2 className="text-2xl font-bold text-black">Reservar Veículo</h2>
+              <p className="text-black/80 text-sm mt-1">
+                {veiculoSelecionado.marca} {veiculoSelecionado.modelo}
+              </p>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-5">
+              {/* Informações do Veículo */}
+              <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-400 text-sm">Valor da diária:</span>
+                  <span className="text-xl font-bold text-yellow-400">
+                    R$ {(veiculoSelecionado?.valorDia || 0).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 text-sm">Categoria:</span>
+                  <span className="text-white">{veiculoSelecionado?.categoria || "N/A"}</span>
+                </div>
+              </div>
+
+              {/* Data Inicial */}
+              <div>
+                <label className="block text-sm font-semibold text-white mb-2">
+                  Data Inicial
+                </label>
+                <input
+                  type="date"
+                  value={dataInicial}
+                  onChange={(e) => setDataInicial(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
+                />
+              </div>
+
+              {/* Data Final */}
+              <div>
+                <label className="block text-sm font-semibold text-white mb-2">
+                  Data Final
+                </label>
+                <input
+                  type="date"
+                  value={dataFinal}
+                  onChange={(e) => setDataFinal(e.target.value)}
+                  min={dataInicial || new Date().toISOString().split("T")[0]}
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
+                />
+              </div>
+
+              {/* Cálculo de Dias */}
+              {dataInicial && dataFinal && (
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-300">Número de dias:</span>
+                    <span className="text-lg font-bold text-yellow-400">
+                      {Math.ceil(
+                        (new Date(dataFinal).getTime() -
+                          new Date(dataInicial).getTime()) /
+                          (1000 * 60 * 60 * 24)
+                      )}{" "}
+                      dias
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-yellow-500/30">
+                    <span className="text-white font-semibold">Total:</span>
+                    <span className="text-2xl font-black text-yellow-400">
+                      R${" "}
+                      {(
+                        (veiculoSelecionado?.valorDia || 0) *
+                        Math.ceil(
+                          (new Date(dataFinal).getTime() -
+                            new Date(dataInicial).getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        )
+                      ).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="bg-slate-800/50 p-6 rounded-b-2xl border-t border-slate-700 flex gap-3">
+              <button
+                onClick={handleFecharModal}
+                className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmarReserva}
+                className="flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                Confirmar <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto">
 
         <div className="mb-10 text-center">
@@ -195,7 +374,7 @@ export default function Veiculos() {
                       <span className="text-sm text-gray-400">/dia</span>
                     </div>
                     <button
-                      onClick={handleReservar}
+                      onClick={() => handleReservar(v)}
                       className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-sm py-2 px-4 rounded-lg transition-colors duration-200"
                     >
                       Reservar <ArrowRight size={15} />

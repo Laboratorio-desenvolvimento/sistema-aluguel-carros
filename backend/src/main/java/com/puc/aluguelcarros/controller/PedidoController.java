@@ -1,23 +1,26 @@
 package com.puc.aluguelcarros.controller;
 import com.puc.aluguelcarros.model.Pedido;
-import com.puc.aluguelcarros.model.UsuarioSistema;
-import com.puc.aluguelcarros.service.ClienteService;
 import com.puc.aluguelcarros.facade.PedidoFacace;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
-import io.micronaut.http.annotation.Error;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import jakarta.transaction.Transactional;
 import java.util.List;
 
 @Controller("/pedidos")
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class PedidoController {
     private final PedidoFacace pedidoFacace;
+    
     public PedidoController(PedidoFacace pedidoFacace) {
         this.pedidoFacace = pedidoFacace;
+    }
+
+    @Get
+    @Status(HttpStatus.OK)
+    public HttpResponse<List<Pedido>> listar() {
+        return pedidoFacace.listarTodos();
     }
 
     @Get("/{id}")
@@ -34,9 +37,12 @@ public class PedidoController {
     @Post
     @Status(HttpStatus.CREATED)
     public HttpResponse<Pedido> criarPedido(@Body Pedido pedido) {
+        if (pedido.getCliente() == null || pedido.getCliente().getId() == null) {
+            return HttpResponse.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
         return pedidoFacace.criarPedido(pedido);
     }
-
 
     @Put("/cancelar")
     @Status(HttpStatus.OK)
