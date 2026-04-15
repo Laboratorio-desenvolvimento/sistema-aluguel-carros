@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
+import { authService } from "~/services/auth.service";
 
 export default function Navbar() {
     const [theme, setTheme] = useState<string | null>(null);
+    const [user, setUser] = useState<{ id: number; nome: string; email: string } | null>(null);
 
     useEffect(() => {
         setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
+        
+        const token = authService.getToken();
+        const storedUser = localStorage.getItem("vrumvrum_usuario");
+        if (token && storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
     }, []);
 
     const toggleTheme = () => {
@@ -18,6 +26,12 @@ export default function Navbar() {
             localStorage.theme = "dark";
             setTheme("dark");
         }
+    };
+
+    const handleLogout = () => {
+        authService.logout();
+        localStorage.removeItem("vrumvrum_usuario");
+        window.location.href = "/";
     };
 
     return (
@@ -40,7 +54,7 @@ export default function Navbar() {
                     </a>
 
                     <div className="flex items-center gap-8">
-                        <div className="hidden md:flex gap-8">
+                        <div className="hidden md:flex items-center gap-8">
                             <a href="/" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
                                 Início
                             </a>
@@ -49,14 +63,28 @@ export default function Navbar() {
                                 Veículos
                             </a>
 
-                            <a href="/login" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
-                                Login
-                            </a>
+                            {user ? (
+                                <>
+                                    <span className="text-yellow-600 dark:text-yellow-500 font-bold tracking-widest text-sm border-l border-gray-300 dark:border-slate-700 pl-8">
+                                        Olá, {user.nome.split(" ")[0]}
+                                    </span>
+                                    <button onClick={handleLogout} className="text-red-500 hover:text-red-600 font-bold uppercase tracking-widest text-sm transition-colors cursor-pointer">
+                                        Sair
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <a href="/login" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors border-l border-gray-300 dark:border-slate-700 pl-8">
+                                        Login
+                                    </a>
 
-                            <a href="/cadastro" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
-                                Cadastro
-                            </a>
+                                    <a href="/cadastro" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
+                                        Cadastro
+                                    </a>
+                                </>
+                            )}
                         </div>
+
                     </div>
                 </div>
             </div>

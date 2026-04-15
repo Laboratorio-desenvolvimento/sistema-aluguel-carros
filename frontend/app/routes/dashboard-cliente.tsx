@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 import Navbar from "~/components/navbar";
+import {useEffect, useState} from "react";
 
 export function meta({}: Route.MetaArgs) {
     return [
@@ -9,9 +10,16 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function DashboardCliente() {
-    localStorage.setItem("nome", "X"); //Remover Linha depois de login funcional!
-    const nome = localStorage.getItem("nome");
+    const [nome, setNome] = useState("");
+
+    useEffect(() => {
+        const nomeSalvo = localStorage.getItem("nome");
+        if (nomeSalvo) {
+            setNome(nomeSalvo);
+        }
+    }, []);
     return (
+
         <main className="bg-slate-950/90 backdrop-blur-md">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12  items-center">
                 <h2 className="text-2xl font-bold "> Bem vindo, {nome}</h2>

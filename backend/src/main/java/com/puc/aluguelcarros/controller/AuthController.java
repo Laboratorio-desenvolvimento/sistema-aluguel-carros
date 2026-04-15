@@ -1,7 +1,8 @@
 package com.puc.aluguelcarros.controller;
 
+import com.puc.aluguelcarros.model.Agente;
 import com.puc.aluguelcarros.model.Cliente;
-import com.puc.aluguelcarros.service.ClienteService;
+import com.puc.aluguelcarros.service.AuthService;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
@@ -18,22 +19,40 @@ import io.micronaut.serde.annotation.Serdeable;
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class AuthController {
 
-    private final ClienteService clienteService;
+    private final AuthService authService;
 
-    public AuthController(ClienteService clienteService) {
-        this.clienteService = clienteService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @Post("/login")
     @Status(HttpStatus.OK)
-    public LoginResponse login(@Body LoginRequest request) {
-        Cliente cliente = clienteService.autenticar(request.email(), request.senha());
+    public AuthResponse login(@Body LoginRequest request) {
+        AuthService.AuthResult result = authService.autenticar(request.email(), request.senha());
+        return toResponse(result, "Login realizado com sucesso.");
+    }
 
-        return new LoginResponse(
-                cliente.getId(),
-                cliente.getNome(),
-                cliente.getEmail(),
-                "Login realizado com sucesso."
+    @Post("/cadastrar/cliente")
+    @Status(HttpStatus.CREATED)
+    public AuthResponse cadastrarCliente(@Body Cliente cliente) {
+        AuthService.AuthResult result = authService.cadastrarCliente(cliente);
+        return toResponse(result, "Cliente cadastrado e logado com sucesso.");
+    }
+
+    @Post("/cadastrar/agente")
+    @Status(HttpStatus.CREATED)
+    public AuthResponse cadastrarAgente(@Body Agente agente) {
+        AuthService.AuthResult result = authService.cadastrarAgente(agente);
+        return toResponse(result, "Agente cadastrado e logado com sucesso.");
+    }
+
+    private AuthResponse toResponse(AuthService.AuthResult result, String mensagem) {
+        return new AuthResponse(
+                result.usuario().getId(),
+                result.usuario().getNome(),
+                result.usuario().getEmail(),
+                result.token(),
+                mensagem
         );
     }
 
@@ -48,5 +67,5 @@ public class AuthController {
 
     @Introspected
     @Serdeable
-    public record LoginResponse(Long id, String nome, String email, String mensagem) {}
+    public record AuthResponse(Long id, String nome, String email, String token, String mensagem) {}
 }

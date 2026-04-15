@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Route } from "./+types/cadastro";
 import { User, Building2, TriangleAlert, Home } from "lucide-react";
+import { authService } from "~/services/auth.service";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -150,30 +151,28 @@ export default function Cadastro() {
 
     try {
       const isCliente = activeTab === "cliente";
-      const url = isCliente ? "/api/cliente" : "/api/agente";
-      const body = isCliente ? clienteData : agenteData;
+      let payload;
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (response.ok) {
-        const tipo = isCliente ? "Cliente" : "Agente";
-        setSuccessMessage(`${tipo} cadastrado com sucesso!`);
-        if (isCliente) {
-          setClienteData({ nome: "", email: "", senha: "", rg: "", cpf: "", profissao: "" });
-        } else {
-          setAgenteData({ nome: "", email: "", senha: "", cnpj: "", tipoAgente: "EMPRESA" });
-        }
-        setTimeout(() => setSuccessMessage(""), 3000);
+      if (isCliente) {
+        payload = await authService.cadastrarCliente(clienteData);
       } else {
-        const errorData = await response.text();
-        setErrorMessage(errorData || "Erro ao realizar cadastro.");
+        payload = await authService.cadastrarAgente(agenteData);
       }
+
+      const tipo = isCliente ? "Cliente" : "Agente";
+      setSuccessMessage(`${tipo} cadastrado com sucesso! Logando...`);
+      localStorage.setItem("vrumvrum_usuario", JSON.stringify({ id: payload.id, nome: payload.nome, email: payload.email }));
+      
+      if (isCliente) {
+        setClienteData({ nome: "", email: "", senha: "", rg: "", cpf: "", profissao: "" });
+      } else {
+        setAgenteData({ nome: "", email: "", senha: "", cnpj: "", tipoAgente: "EMPRESA" });
+      }
+      
+      setTimeout(() => { window.location.href = "/"; }, 1500);
+
     } catch (error) {
-      setErrorMessage(`Erro de conexão: ${error instanceof Error ? error.message : "Erro desconhecido"}`);
+      setErrorMessage(`Erro: ${error instanceof Error ? error.message : "Erro desconhecido"}`);
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { Route } from "./+types/login";
 import Navbar from "~/components/navbar";
 import { Home } from "lucide-react";
+import { authService, type LoginRequest } from "~/services/auth.service";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -69,20 +70,8 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginData),
-      });
+      const payload = await authService.login(loginData);
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || "Falha ao autenticar.");
-      }
-
-      const payload = (await response.json()) as LoginResponse;
       localStorage.setItem("vrumvrum_usuario", JSON.stringify({ id: payload.id, nome: payload.nome, email: payload.email }));
       setSuccessMessage(`Bem-vindo(a), ${payload.nome}! Redirecionando...`);
       setLoginData({ email: "", senha: "" });
