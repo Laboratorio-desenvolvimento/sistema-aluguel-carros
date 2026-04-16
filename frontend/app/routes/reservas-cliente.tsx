@@ -227,9 +227,19 @@ export default function ReservasCliente() {
                         <p className="text-sm text-gray-400">Categoria: {selectedPedido.veiculo.categoria}</p>
                     </div>
                     <div>
-                        <h3 className="text-sm font-semibold text-white mb-2">Valor por dia</h3>
-                        <p className="text-lg font-bold text-white">{formatCurrency(selectedPedido.veiculo.valorDia)}</p>
-                    </div>
+                        <h3 className="text-sm font-semibold text-white mb-2">Valor</h3>
+
+                        <p className="text-lg font-bold text-yellow-400">
+                            {formatCurrency(
+                            (selectedPedido.veiculo.valorDia || 0) *
+                            Math.ceil(
+                                (new Date(selectedPedido.dataFimDesejada).getTime() -
+                                new Date(selectedPedido.dataInicioDesejada).getTime()) /
+                                (1000 * 60 * 60 * 24)
+                            )
+                            )}
+                        </p>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl">
