@@ -13,90 +13,90 @@ import {
 } from "lucide-react";
 
 export function meta({ }: Route.MetaArgs) {
-    return [
-        { title: "Minhas Reservas - VrumVrum" },
-        { name: "description", content: "Consulte suas reservas de veículos no VrumVrum" },
-    ];
-    }
+  return [
+    { title: "Minhas Reservas - VrumVrum" },
+    { name: "description", content: "Consulte suas reservas de veículos no VrumVrum" },
+  ];
+}
 
-    interface Pedido {
+interface Pedido {
+  id: number;
+  dataSolicitacao: string;
+  dataInicioDesejada: string;
+  dataFimDesejada: string;
+  status: string;
+  cliente: {
     id: number;
-    dataSolicitacao: string;
-    dataInicioDesejada: string;
-    dataFimDesejada: string;
-    status: string;
-    cliente: {
-        id: number;
-        nome: string;
-        email: string;
-    };
-    agente?: {
-        id: number;
-        nome: string;
-        email: string;
-    };
-    veiculo: {
-        id: number;
-        marca: string;
-        modelo: string;
-        placa: string;
-        categoria: string;
-        valorDia: number;
-    };
-    contrato?: {
-        id: number;
-        dataInicio: string;
-        dataFim: string;
-        valorTotal: number;
-    };
-    }
+    nome: string;
+    email: string;
+  };
+  agente?: {
+    id: number;
+    nome: string;
+    email: string;
+  };
+  veiculo: {
+    id: number;
+    marca: string;
+    modelo: string;
+    placa: string;
+    categoria: string;
+    valorDia: number;
+  };
+  contrato?: {
+    id: number;
+    dataInicio: string;
+    dataFim: string;
+    valorTotal: number;
+  };
+}
 
-    const statusConfig = {
-    INTRODUCED: { label: "Introduzido", color: "bg-blue-500", icon: Clock },
-    UNDER_REVIEW: { label: "Em Análise", color: "bg-yellow-500", icon: AlertCircle },
-    APPROVED: { label: "Aprovado", color: "bg-green-500", icon: CheckCircle },
-    REJECTED: { label: "Rejeitado", color: "bg-red-500", icon: XCircle },
-    CANCELLED: { label: "Cancelado", color: "bg-gray-500", icon: XCircle },
-    COMPLETED: { label: "Concluído", color: "bg-purple-500", icon: CheckCircle },
-    };
+const statusConfig = {
+  INTRODUCED: { label: "Introduzido", color: "bg-yellow-400", icon: Clock },
+  UNDER_REVIEW: { label: "Em Análise", color: "bg-yellow-500", icon: AlertCircle },
+  APPROVED: { label: "Aprovado", color: "bg-green-400", icon: CheckCircle },
+  REJECTED: { label: "Rejeitado", color: "bg-red-500", icon: XCircle },
+  CANCELLED: { label: "Cancelado", color: "bg-slate-800/50 border border-slate-700/500", icon: XCircle },
+  COMPLETED: { label: "Concluído", color: "bg-purple-500", icon: CheckCircle },
+};
 
-    export default function ReservasCliente() {
-    const [pedidos, setPedidos] = useState<Pedido[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
+export default function ReservasCliente() {
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
 
-    useEffect(() => {
-        fetchPedidos();
-    }, []);
+  useEffect(() => {
+    fetchPedidos();
+  }, []);
 
-    const fetchPedidos = async () => {
-        try {
-        const token = localStorage.getItem("jwt_token");
-        if (!token) {
-            setError("Usuário não autenticado");
-            setLoading(false);
-            return;
-        }
-
-        const response = await fetch("http://localhost:8080/pedidos/cliente", {
-            headers: {
-            Authorization: `Bearer ${token}`,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Erro ao buscar pedidos");
-        }
-
-        const data = await response.json();
-        setPedidos(data);
-        } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro desconhecido");
-        } finally {
+  const fetchPedidos = async () => {
+    try {
+      const token = localStorage.getItem("jwt_token");
+      if (!token) {
+        setError("Usuário não autenticado");
         setLoading(false);
-        }
-    };
+        return;
+      }
+
+      const response = await fetch("http://localhost:8080/pedidos/cliente", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao buscar pedidos");
+      }
+
+      const data = await response.json();
+      setPedidos(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro desconhecido");
+    } finally {
+      setLoading(false);
+    }
+  };
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -112,78 +112,78 @@ export function meta({ }: Route.MetaArgs) {
         }).format(value);
     };
 
-    if (loading) {
-        return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Carregando suas reservas...</p>
-            </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-800/50 border border-slate-700/50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando suas reservas...</p>
         </div>
-        );
-    }
+      </div>
+    );
+  }
 
-    if (error) {
-        return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="text-center">
-            <XCircle className="h-12 w-12 text-red-500 mx-auto" />
-            <p className="mt-4 text-red-600">{error}</p>
-            <button
-                onClick={fetchPedidos}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-                Tentar novamente
-            </button>
-            </div>
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-800/50 border border-slate-700/50 flex items-center justify-center">
+        <div className="text-center">
+          <XCircle className="h-12 w-12 text-red-500 mx-auto" />
+          <p className="mt-4 text-red-600">{error}</p>
+          <button
+            onClick={fetchPedidos}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Tentar novamente
+          </button>
         </div>
-        );
-    }
+      </div>
+    );
+  }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-slate-950/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Minhas Reservas</h1>
-            <p className="mt-2 text-gray-600">Consulte o status das suas solicitações de aluguel</p>
+            <h1 className="text-3xl font-bold text-white">Minhas Reservas</h1>
+            <p className="mt-2 text-gray-300">Consulte o status das suas solicitações de aluguel</p>
             </div>
 
             {pedidos.length === 0 ? (
             <div className="text-center py-12">
                 <Car className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma reserva encontrada</h3>
+                <h3 className="text-lg font-medium text-white mb-2">Nenhuma reserva encontrada</h3>
                 <p className="text-gray-600">Você ainda não fez nenhuma solicitação de aluguel.</p>
             </div>
             ) : (
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800 rounded-2xl shadow-xl">
                 <ul className="divide-y divide-gray-200">
                 {pedidos.map((pedido) => {
                     const statusInfo = statusConfig[pedido.status as keyof typeof statusConfig] || statusConfig.INTRODUCED;
                     const StatusIcon = statusInfo.icon;
                     return (
-                    <li key={pedido.id} className="px-6 py-4">
+                    <li key={pedido.id} className="px-6 py-4 hover:bg-slate-800/40 transition-colors">
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-4">
                             <span className={`flex-shrink-0 w-3 h-3 rounded-full ${statusInfo.color}`}></span>
                             <div>
-                            <div className="flex items-center gap-2 text-sm text-gray-900 font-medium">
+                            <div className="flex items-center gap-2 text-sm text-white font-medium">
                                 <Car className="h-5 w-5 text-gray-400" />
                                 {pedido.veiculo.marca} {pedido.veiculo.modelo}
                             </div>
-                            <div className="text-sm text-gray-500 mt-1">
+                            <div className="text-sm text-gray-400 mt-1">
                                 {pedido.veiculo.placa} • {formatDate(pedido.dataInicioDesejada)} - {formatDate(pedido.dataFimDesejada)}
                             </div>
                             </div>
                         </div>
                         <div className="flex flex-col sm:items-end gap-2">
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <div className="flex items-center gap-2 text-sm text-gray-400">
                             <StatusIcon className="h-4 w-4" />
                             <span>{statusInfo.label}</span>
                             </div>
-                            <div className="text-sm font-medium text-gray-900">Reserva #{pedido.id}</div>
+                            <div className="text-sm font-medium text-white">Reserva #{pedido.id}</div>
                             <button
                             onClick={() => setSelectedPedido(pedido)}
-                            className="inline-flex items-center gap-1 px-3 py-1 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                            className="inline-flex items-center gap-1 px-3 py-1 border border-slate-700 rounded-md text-white bg-slate-800 hover:bg-slate-700 transition-colors"
                             >
                             <Eye className="h-4 w-4" />
                             Detalhes
@@ -199,11 +199,11 @@ export function meta({ }: Route.MetaArgs) {
 
             {selectedPedido && (
             <div className="fixed inset-0 z-50 bg-black/50 flex items-start justify-center overflow-y-auto p-4">
-                <div className="mt-20 w-full max-w-2xl rounded-2xl bg-white shadow-2xl p-6">
+                <div className="mt-20 w-full max-w-2xl rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-6">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                    <h2 className="text-xl font-semibold text-gray-900">Detalhes da Reserva #{selectedPedido.id}</h2>
-                    <p className="text-sm text-gray-500">
+                    <h2 className="text-xl font-semibold text-white">Detalhes da Reserva #{selectedPedido.id}</h2>
+                    <p className="text-sm text-gray-400">
                         Pedido de {formatDate(selectedPedido.dataInicioDesejada)} até {formatDate(selectedPedido.dataFimDesejada)}
                     </p>
                     </div>
@@ -219,41 +219,41 @@ export function meta({ }: Route.MetaArgs) {
                     <span>{statusConfig[selectedPedido.status as keyof typeof statusConfig]?.label ?? selectedPedido.status}</span>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-gray-50 p-4 rounded-2xl">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl">
                     <div>
-                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Veículo</h3>
+                        <h3 className="text-sm font-semibold text-white mb-2">Veículo</h3>
                         <p className="text-sm text-gray-700">{selectedPedido.veiculo.marca} {selectedPedido.veiculo.modelo}</p>
-                        <p className="text-sm text-gray-500">Placa: {selectedPedido.veiculo.placa}</p>
-                        <p className="text-sm text-gray-500">Categoria: {selectedPedido.veiculo.categoria}</p>
+                        <p className="text-sm text-gray-400">Placa: {selectedPedido.veiculo.placa}</p>
+                        <p className="text-sm text-gray-400">Categoria: {selectedPedido.veiculo.categoria}</p>
                     </div>
                     <div>
-                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Valor por dia</h3>
-                        <p className="text-lg font-bold text-gray-900">{formatCurrency(selectedPedido.veiculo.valorDia)}</p>
+                        <h3 className="text-sm font-semibold text-white mb-2">Valor por dia</h3>
+                        <p className="text-lg font-bold text-white">{formatCurrency(selectedPedido.veiculo.valorDia)}</p>
                     </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-gray-50 p-4 rounded-2xl">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl">
                     <div>
-                        <span className="text-sm font-medium text-gray-900">Início</span>
+                        <span className="text-sm font-medium text-white">Início</span>
                         <p className="text-sm text-gray-700">{formatDate(selectedPedido.dataInicioDesejada)}</p>
                     </div>
                     <div>
-                        <span className="text-sm font-medium text-gray-900">Fim</span>
+                        <span className="text-sm font-medium text-white">Fim</span>
                         <p className="text-sm text-gray-700">{formatDate(selectedPedido.dataFimDesejada)}</p>
                     </div>
                     </div>
 
                     {selectedPedido.agente ? (
-                    <div className="bg-gray-50 p-4 rounded-2xl">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 mb-2">
+                    <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-white mb-2">
                         <User className="h-5 w-5 text-gray-700" />
                         Agente responsável
                         </div>
                         <p className="text-sm text-gray-700">{selectedPedido.agente.nome}</p>
-                        <p className="text-sm text-gray-500">{selectedPedido.agente.email}</p>
+                        <p className="text-sm text-gray-400">{selectedPedido.agente.email}</p>
                     </div>
                     ) : (
-                    <div className="bg-yellow-50 p-4 rounded-2xl text-yellow-800">
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-2xl text-yellow-300">
                         <div className="flex items-center gap-2">
                         <AlertCircle className="h-5 w-5" />
                         Contrato ainda não foi gerado para esta reserva.
@@ -262,8 +262,8 @@ export function meta({ }: Route.MetaArgs) {
                     )}
 
                     {selectedPedido.contrato && (
-                    <div className="bg-gray-50 p-4 rounded-2xl">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 mb-2">
+                    <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-white mb-2">
                         <FileText className="h-5 w-5 text-gray-700" />
                         Contrato
                         </div>
@@ -290,4 +290,4 @@ export function meta({ }: Route.MetaArgs) {
         </div>
         </div>
     );
-    }
+}
