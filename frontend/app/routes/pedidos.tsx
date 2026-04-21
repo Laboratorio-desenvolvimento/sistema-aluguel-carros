@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Route } from "./+types/dashboard-cliente";
+import type { Route } from "./+types/pedidos";
 import {
   Car,
   Calendar,
@@ -11,6 +11,7 @@ import {
   XCircle,
   AlertCircle,
 } from "lucide-react";
+import api from "~/services/api.service";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -83,27 +84,10 @@ export default function Pedidos() {
 
   const fetchPedidos = async () => {
     try {
-      const token = localStorage.getItem("jwt_token");
-      if (!token) {
-        setError("Usuário não autenticado");
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch("http://localhost:8080/pedidos/cliente", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao buscar pedidos");
-      }
-
-      const data = await response.json();
-      setPedidos(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro desconhecido");
+      const response = await api.get("/pedidos/cliente");
+      setPedidos(response.data);
+    } catch (err: any) {
+      setError(err.response?.data?.mensagem || "Erro ao buscar pedidos");
     } finally {
       setLoading(false);
     }
@@ -125,29 +109,43 @@ export default function Pedidos() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg-card/50 border border-slate-700/50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-text-main/60">Carregando suas reservas...</p>
+        <div className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="mb-8">
+            <h1 className="text-3xl font-bold text-text-main">Minhas Reservas</h1>
+            <p className="mt-2 text-text-main/80">Consulte o status das suas solicitações de aluguel</p>
+            </div>
+            <div className="text-center py-12">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <h3 className="text-lg font-medium text-text-main mb-2">Buscando...</h3>
+                <p className="text-text-main/60">Estamos localizando suas reservas.</p>
+            </div>
         </div>
-      </div>
+        </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-bg-card/50 border border-slate-700/50 flex items-center justify-center">
-        <div className="text-center">
-          <XCircle className="h-12 w-12 text-red-500 mx-auto" />
-          <p className="mt-4 text-red-600">{error}</p>
-          <button
-            onClick={fetchPedidos}
-            className="mt-4 px-4 py-2 bg-blue-600 text-text-main rounded-lg hover:bg-blue-700"
-          >
-            Tentar novamente
-          </button>
+        <div className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="mb-8">
+            <h1 className="text-3xl font-bold text-text-main">Minhas Reservas</h1>
+            <p className="mt-2 text-text-main/80">Consulte o status das suas solicitações de aluguel</p>
+            </div>
+            <div className="text-center py-12">
+                <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-text-main mb-2">Ops! Ocorreu um erro</h3>
+                <p className="text-text-main/60 mb-6">{error}</p>
+                <button
+                    onClick={fetchPedidos}
+                    className="inline-flex items-center gap-2 px-6 py-2 bg-primary hover:bg-primary-hover text-black font-bold rounded-lg transition-colors"
+                >
+                    Tentar novamente
+                </button>
+            </div>
         </div>
-      </div>
+        </div>
     );
   }
 

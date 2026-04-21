@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Route } from "./+types/cadastro-veiculo";
 import { CarFront, PlusCircle, ShieldCheck } from "lucide-react";
+import api from "~/services/api.service";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -132,18 +133,7 @@ export default function CadastroVeiculo() {
         foto: formData.foto.trim() || null,
       };
 
-      const response = await fetch("/api/veiculo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Não foi possível cadastrar o veículo.");
-      }
+      await api.post("/veiculo", payload);
 
       setSuccessMessage("Veículo cadastrado com sucesso.");
       setFormData(initialFormData);

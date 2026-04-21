@@ -11,6 +11,7 @@ import {
   Wifi,
   ShieldCheck,
 } from "lucide-react";
+import api from "~/services/api.service";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -58,10 +59,9 @@ export default function Veiculos() {
     const usuario = localStorage.getItem("vrumvrum_usuario");
     setAutenticado(!!usuario);
 
-    fetch("/api/veiculo")
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => {
-        setVeiculos(data);
+    api.get("/veiculo")
+      .then((res) => {
+        setVeiculos(res.data);
         setLoading(false);
       })
       .catch((_) => {
@@ -118,29 +118,18 @@ export default function Veiculos() {
 
       console.log("Enviando reserva:", reserva);
 
-      const resposta = await fetch("/api/pedidos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(reserva),
-      });
+      const resposta = await api.post("/pedidos", reserva);
 
-      if (resposta.ok) {
-        const pedidoCriado = await resposta.json();
-        alert("Reserva criada com sucesso!");
-        console.log("Pedido criado:", pedidoCriado);
-        setModalAberto(false);
-      } else if (resposta.status === 409) {
+      alert("Reserva criada com sucesso!");
+      console.log("Pedido criado:", resposta.data);
+      setModalAberto(false);
+    } catch (erro: any) {
+      if (erro.response && erro.response.status === 409) {
         alert("Veículo não está disponível para as datas selecionadas!");
       } else {
-        const errorText = await resposta.text();
-        console.error("Erro do servidor:", errorText);
-        alert(`Erro ao criar reserva: ${resposta.status} - ${errorText}`);
+        console.error("Erro ao enviar reserva:", erro);
+        alert("Erro ao criar reserva. Verifique o console para mais detalhes.");
       }
-    } catch (erro) {
-      console.error("Erro ao enviar reserva:", erro);
-      alert("Erro de conexão. Verifique sua conexão com o servidor.");
     }
   };
 
