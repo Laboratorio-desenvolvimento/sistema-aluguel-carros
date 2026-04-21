@@ -10,6 +10,11 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  MapPin,
+  PenTool,
+  ShieldCheck,
 } from "lucide-react";
 import api from "~/services/api.service";
 
@@ -49,6 +54,8 @@ interface Pedido {
     dataInicio: string;
     dataFim: string;
     valorTotal: number;
+    assinadoCliente: boolean;
+    assinadoAgente: boolean;
   };
 }
 
@@ -100,11 +107,27 @@ export default function Pedidos() {
         });
     };
 
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-        }).format(value);
+    const handleAssinar = async (id: number) => {
+      try {
+        await api.post(`/pedidos/${id}/assinar`);
+        alert("Contrato assinado com sucesso!");
+        fetchPedidos();
+      } catch (err: any) {
+        alert(err.response?.data?.mensagem || "Erro ao assinar contrato");
+      }
+    };
+
+    const steps = [
+      { id: "INTRODUCED", label: "Solicitação", desc: "Aguardando agente" },
+      { id: "UNDER_REVIEW", label: "Análise", desc: "Verificando dados" },
+      { id: "APPROVED", label: "Aprovado", desc: "Contrato gerado" },
+      { id: "COMPLETED", label: "Concluído", desc: "Veículo retirado" },
+    ];
+
+    const getStepIndex = (status: string) => {
+      if (status === "REJECTED" || status === "CANCELLED") return -1;
+      const index = steps.findIndex(s => s.id === status);
+      return index === -1 ? 0 : index;
     };
 
   if (loading) {
@@ -150,163 +173,198 @@ export default function Pedidos() {
   }
 
     return (
-        <div className="min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="mb-8">
-            <h1 className="text-3xl font-bold text-text-main">Minhas Reservas</h1>
-            <p className="mt-2 text-text-main/80">Consulte o status das suas solicitações de aluguel</p>
-            </div>
-
-            {pedidos.length === 0 ? (
-            <div className="text-center py-12">
-                <Car className="h-16 w-16 text-text-main/70 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-text-main mb-2">Nenhuma reserva encontrada</h3>
-                <p className="text-text-main/60">Você ainda não fez nenhuma solicitação de aluguel.</p>
-            </div>
-            ) : (
-            <div className="bg-bg-card/40 backdrop-blur-md border border-slate-800 rounded-2xl shadow-xl">
-                <ul className="divide-y divide-gray-200">
-                {pedidos.map((pedido) => {
-                    const statusInfo = statusConfig[pedido.status as keyof typeof statusConfig] || statusConfig.INTRODUCED;
-                    const StatusIcon = statusInfo.icon;
-                    return (
-                    <li key={pedido.id} className="px-6 py-4 hover:bg-slate-800/40 transition-colors">
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex items-center gap-4">
-                            <span className={`flex-shrink-0 w-3 h-3 rounded-full ${statusInfo.color}`}></span>
-                            <div>
-                            <div className="flex items-center gap-2 text-sm text-text-main font-medium">
-                                <Car className="h-5 w-5 text-text-main/70" />
-                                {pedido.veiculo.marca} {pedido.veiculo.modelo}
-                            </div>
-                            <div className="text-sm text-text-main/70 mt-1">
-                                {pedido.veiculo.placa} • {formatDate(pedido.dataInicioDesejada)} - {formatDate(pedido.dataFimDesejada)}
-                            </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col sm:items-end gap-2">
-                            <div className="flex items-center gap-2 text-sm text-text-main/70">
-                            <StatusIcon className="h-4 w-4" />
-                            <span>{statusInfo.label}</span>
-                            </div>
-                            <div className="text-sm font-medium text-text-main">Reserva #{pedido.id}</div>
-                            <button
-                            onClick={() => setSelectedPedido(pedido)}
-                            className="inline-flex items-center gap-1 px-3 py-1 border border-slate-700 rounded-md text-text-main bg-slate-800 hover:bg-slate-700 transition-colors"
-                            >
-                            <Eye className="h-4 w-4" />
-                            Detalhes
-                            </button>
-                        </div>
-                        </div>
-                    </li>
-                    );
-                })}
-                </ul>
-            </div>
-            )}
-
-            {selectedPedido && (
-            <div className="fixed inset-0 z-50 bg-black/50 flex items-start justify-center overflow-y-auto p-4">
-                <div className="mt-20 w-full max-w-2xl rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                    <h2 className="text-xl font-semibold text-text-main">Detalhes da Reserva #{selectedPedido.id}</h2>
-                    <p className="text-sm text-text-main/70">
-                        Pedido de {formatDate(selectedPedido.dataInicioDesejada)} até {formatDate(selectedPedido.dataFimDesejada)}
-                    </p>
-                    </div>
-                    <button onClick={() => setSelectedPedido(null)} className="text-text-main/70 hover:text-gray-700">
-                    <XCircle className="h-6 w-6" />
-                    </button>
+        <div className="min-h-screen py-10">
+            <div className="max-w-5xl mx-auto px-4">
+                <div className="mb-12">
+                    <h1 className="text-5xl font-racing text-primary italic mb-2">Minhas <span className="text-text-main">Reservas</span></h1>
+                    <p className="text-text-main/60 font-medium">Acompanhe o status e assine seus contratos digitalmente.</p>
                 </div>
 
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <Clock className="h-5 w-5 text-blue-500" />
-                    <span className="font-medium">Status:</span>
-                    <span>{statusConfig[selectedPedido.status as keyof typeof statusConfig]?.label ?? selectedPedido.status}</span>
+                {pedidos.length === 0 ? (
+                    <div className="text-center py-20 bg-bg-card/20 border border-dashed border-slate-700 rounded-[2.5rem]">
+                        <Car className="h-20 w-20 text-text-main/10 mx-auto mb-6" />
+                        <h3 className="text-2xl font-bold text-text-main mb-2">Nenhuma reserva encontrada</h3>
+                        <p className="text-text-main/40">Você ainda não realizou nenhuma solicitação de aluguel.</p>
                     </div>
+                ) : (
+                    <div className="space-y-6">
+                        {pedidos.map((pedido) => {
+                            const isSelected = selectedPedido?.id === pedido.id;
+                            const statusInfo = statusConfig[pedido.status as keyof typeof statusConfig] || statusConfig.INTRODUCED;
+                            const StatusIcon = statusInfo.icon;
+                            const currentStep = getStepIndex(pedido.status);
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-bg-card/50 border border-slate-700/50 p-4 rounded-2xl">
-                    <div>
-                        <h3 className="text-sm font-semibold text-text-main mb-2">Veículo</h3>
-                        <p className="text-sm text-gray-700">{selectedPedido.veiculo.marca} {selectedPedido.veiculo.modelo}</p>
-                        <p className="text-sm text-text-main/70">Placa: {selectedPedido.veiculo.placa}</p>
-                        <p className="text-sm text-text-main/70">Categoria: {selectedPedido.veiculo.categoria}</p>
-                    </div>
-                    <div>
-                        <h3 className="text-sm font-semibold text-text-main mb-2">Valor</h3>
+                            return (
+                                <div 
+                                    key={pedido.id} 
+                                    className={`bg-bg-card/40 backdrop-blur-md border transition-all duration-500 overflow-hidden ${
+                                        isSelected ? "border-primary/50 ring-1 ring-primary/20 rounded-[2.5rem]" : "border-slate-800 rounded-[2rem] hover:border-slate-600"
+                                    }`}
+                                >
+                                    {/* Header do Item */}
+                                    <div 
+                                        onClick={() => setSelectedPedido(isSelected ? null : pedido)}
+                                        className="p-8 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6"
+                                    >
+                                        <div className="flex items-center gap-6">
+                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${statusInfo.color} text-black shadow-lg`}>
+                                                <StatusIcon size={28} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-bold text-text-main">{pedido.veiculo.marca} {pedido.veiculo.modelo}</h3>
+                                                <p className="text-sm text-text-main/40 font-bold uppercase tracking-widest mt-0.5">Reserva #{pedido.id} • {formatDate(pedido.dataSolicitacao)}</p>
+                                            </div>
+                                        </div>
 
-                        <p className="text-lg font-bold text-primary">
-                            {formatCurrency(
-                            (selectedPedido.veiculo.valorDia || 0) *
-                            Math.ceil(
-                                (new Date(selectedPedido.dataFimDesejada).getTime() -
-                                new Date(selectedPedido.dataInicioDesejada).getTime()) /
-                                (1000 * 60 * 60 * 24)
-                            )
-                            )}
-                        </p>
-                        </div>
-                    </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-right hidden md:block">
+                                                <p className="text-xs text-text-main/40 font-black uppercase tracking-widest mb-1">Status Atual</p>
+                                                <p className={`text-sm font-bold ${statusInfo.color.replace('bg-', 'text-')}`}>{statusInfo.label}</p>
+                                            </div>
+                                            <div className={`p-2 rounded-lg bg-slate-800 text-text-main/40 transition-transform duration-500 ${isSelected ? "rotate-180 text-primary" : ""}`}>
+                                                <ChevronDown size={20} />
+                                            </div>
+                                        </div>
+                                    </div>
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-bg-card/50 border border-slate-700/50 p-4 rounded-2xl">
-                    <div>
-                        <span className="text-sm font-medium text-text-main">Início</span>
-                        <p className="text-sm text-gray-700">{formatDate(selectedPedido.dataInicioDesejada)}</p>
-                    </div>
-                    <div>
-                        <span className="text-sm font-medium text-text-main">Fim</span>
-                        <p className="text-sm text-gray-700">{formatDate(selectedPedido.dataFimDesejada)}</p>
-                    </div>
-                    </div>
+                                    {/* Conteúdo Expandido */}
+                                    {isSelected && (
+                                        <div className="p-8 pt-0 border-t border-slate-700/30 animate-in slide-in-from-top-4 duration-500">
+                                            {/* Stepper de Progresso */}
+                                            {currentStep !== -1 && (
+                                                <div className="py-10">
+                                                    <div className="relative flex justify-between">
+                                                        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-800 -translate-y-1/2" />
+                                                        <div 
+                                                            className="absolute top-1/2 left-0 h-0.5 bg-primary -translate-y-1/2 transition-all duration-1000" 
+                                                            style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+                                                        />
+                                                        {steps.map((step, idx) => (
+                                                            <div key={step.id} className="relative z-10 flex flex-col items-center">
+                                                                <div className={`w-10 h-10 rounded-full border-4 flex items-center justify-center transition-all duration-500 ${
+                                                                    idx <= currentStep ? "bg-primary border-primary text-black" : "bg-bg-card border-slate-800 text-text-main/20"
+                                                                }`}>
+                                                                    {idx < currentStep ? <CheckCircle size={18} /> : <span className="text-xs font-black">{idx + 1}</span>}
+                                                                </div>
+                                                                <p className={`text-[10px] font-black uppercase tracking-widest mt-3 ${idx <= currentStep ? "text-primary" : "text-text-main/20"}`}>{step.label}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
 
-                    {selectedPedido.agente ? (
-                    <div className="bg-bg-card/50 border border-slate-700/50 p-4 rounded-2xl">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-text-main mb-2">
-                        <User className="h-5 w-5 text-gray-700" />
-                        Agente responsável
-                        </div>
-                        <p className="text-sm text-gray-700">{selectedPedido.agente.nome}</p>
-                        <p className="text-sm text-text-main/70">{selectedPedido.agente.email}</p>
-                    </div>
-                    ) : (
-                    <div className="bg-primary/10 border border-yellow-500/30 p-4 rounded-2xl text-primary">
-                        <div className="flex items-center gap-2">
-                        <AlertCircle className="h-5 w-5" />
-                        Contrato ainda não foi gerado para esta reserva.
-                        </div>
-                    </div>
-                    )}
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
+                                                {/* Detalhes do Veículo e Período */}
+                                                <div className="space-y-6">
+                                                    <div className="bg-slate-800/30 rounded-3xl p-6 border border-slate-700/30">
+                                                        <h4 className="text-xs font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2">
+                                                            <Car size={14} /> Detalhes do Aluguel
+                                                        </h4>
+                                                        <div className="grid grid-cols-2 gap-6">
+                                                            <div>
+                                                                <p className="text-[10px] text-text-main/30 font-black uppercase tracking-widest mb-1">Período</p>
+                                                                <p className="text-sm text-text-main font-bold">{formatDate(pedido.dataInicioDesejada)} - {formatDate(pedido.dataFimDesejada)}</p>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-[10px] text-text-main/30 font-black uppercase tracking-widest mb-1">Categoria</p>
+                                                                <p className="text-sm text-text-main font-bold">{pedido.veiculo.categoria}</p>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-[10px] text-text-main/30 font-black uppercase tracking-widest mb-1">Placa</p>
+                                                                <p className="text-sm text-text-main font-bold">{pedido.veiculo.placa}</p>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-[10px] text-text-main/30 font-black uppercase tracking-widest mb-1">Valor Diária</p>
+                                                                <p className="text-sm text-text-main font-bold">R$ {pedido.veiculo.valorDia.toFixed(2)}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-                    {selectedPedido.contrato && (
-                    <div className="bg-bg-card/50 border border-slate-700/50 p-4 rounded-2xl">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-text-main mb-2">
-                        <FileText className="h-5 w-5 text-gray-700" />
-                        Contrato
-                        </div>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm text-gray-700">
-                        <div>
-                            <span className="font-medium">Início</span>
-                            <p>{formatDate(selectedPedido.contrato.dataInicio)}</p>
-                        </div>
-                        <div>
-                            <span className="font-medium">Fim</span>
-                            <p>{formatDate(selectedPedido.contrato.dataFim)}</p>
-                        </div>
-                        <div className="sm:col-span-2">
-                            <span className="font-medium">Valor total</span>
-                            <p className="text-lg font-bold text-green-600">{formatCurrency(selectedPedido.contrato.valorTotal)}</p>
-                        </div>
-                        </div>
+                                                    {pedido.agente && (
+                                                        <div className="bg-primary/5 rounded-3xl p-6 border border-primary/10">
+                                                            <h4 className="text-xs font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2">
+                                                                <User size={14} /> Atendimento
+                                                            </h4>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                                                                    {pedido.agente.nome[0]}
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-sm text-text-main font-bold">{pedido.agente.nome}</p>
+                                                                    <p className="text-xs text-text-main/40">{pedido.agente.email}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Contrato e Assinaturas */}
+                                                <div className="space-y-6">
+                                                    {pedido.contrato ? (
+                                                        <div className="bg-slate-800/30 rounded-3xl p-6 border border-slate-700/30 h-full flex flex-col">
+                                                            <h4 className="text-xs font-black text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
+                                                                <PenTool size={14} /> Contrato Digital
+                                                            </h4>
+                                                            
+                                                            <div className="flex-1 space-y-6">
+                                                                <div className="flex justify-between items-end">
+                                                                    <div>
+                                                                        <p className="text-[10px] text-text-main/30 font-black uppercase tracking-widest mb-1">Valor Total do Contrato</p>
+                                                                        <p className="text-3xl font-black text-text-main">R$ {pedido.contrato.valorTotal.toFixed(2)}</p>
+                                                                    </div>
+                                                                    <div className="bg-green-500/10 text-green-500 px-3 py-1 rounded-lg text-[10px] font-black uppercase border border-green-500/20">
+                                                                        Garantia Ativa
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="space-y-4 pt-4 border-t border-slate-700/30">
+                                                                    {/* Assinatura Cliente */}
+                                                                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-900/50 border border-slate-700/50">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <ShieldCheck size={20} className={pedido.contrato.assinadoCliente ? "text-green-500" : "text-text-main/20"} />
+                                                                            <span className="text-sm font-bold">Sua Assinatura</span>
+                                                                        </div>
+                                                                        {pedido.contrato.assinadoCliente ? (
+                                                                            <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Confirmado</span>
+                                                                        ) : (
+                                                                            <button 
+                                                                                onClick={() => handleAssinar(pedido.id)}
+                                                                                className="px-4 py-2 bg-primary hover:bg-primary/90 text-black text-[10px] font-black rounded-lg transition-all cursor-pointer"
+                                                                            >
+                                                                                ASSINAR AGORA
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+
+                                                                    {/* Assinatura Agente */}
+                                                                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-900/50 border border-slate-700/50">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <ShieldCheck size={20} className={pedido.contrato.assinadoAgente ? "text-green-500" : "text-text-main/20"} />
+                                                                            <span className="text-sm font-bold">Assinatura do Agente</span>
+                                                                        </div>
+                                                                        <span className={`text-[10px] font-black uppercase tracking-widest ${pedido.contrato.assinadoAgente ? "text-green-500" : "text-text-main/20"}`}>
+                                                                            {pedido.contrato.assinadoAgente ? "Confirmado" : "Pendente"}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="bg-slate-800/10 border-2 border-dashed border-slate-700/30 rounded-3xl p-10 text-center flex flex-col items-center justify-center h-full">
+                                                            <FileText size={40} className="text-text-main/10 mb-4" />
+                                                            <p className="text-sm text-text-main/40 font-bold uppercase tracking-widest">Aguardando aprovação para gerar contrato</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
-                    )}
-                </div>
-                </div>
+                )}
             </div>
-            )}
-        </div>
         </div>
     );
 }
