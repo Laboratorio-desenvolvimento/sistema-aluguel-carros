@@ -16,6 +16,8 @@ public class Contrato {
     private Date dataInicio;
     private Date dataFim;
     private Double valorTotal;
+    private boolean assinadoCliente;
+    private boolean assinadoAgente;
     @Enumerated(EnumType.STRING)
     private TipoPropriedade tipoPropriedade;
     @OneToOne

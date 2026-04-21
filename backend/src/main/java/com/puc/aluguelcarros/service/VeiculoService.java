@@ -12,13 +12,24 @@ import java.util.List;
 public class VeiculoService {
 
     private final VeiculoRepository veiculoRepository;
+    private final PedidoService pedidoService;
 
-    public VeiculoService(VeiculoRepository veiculoRepository) {
+    public VeiculoService(VeiculoRepository veiculoRepository, PedidoService pedidoService) {
         this.veiculoRepository = veiculoRepository;
+        this.pedidoService = pedidoService;
     }
 
     public List<Veiculo> listarTodos() {
         return veiculoRepository.findAll();
+    }
+
+    public List<Veiculo> listarDisponiveis(java.util.Date inicio, java.util.Date fim) {
+        List<Veiculo> todos = veiculoRepository.findAll();
+        if (inicio == null || fim == null) return todos;
+
+        return todos.stream()
+            .filter(v -> pedidoService.verificarDisponibilidade(v, inicio, fim))
+            .toList();
     }
 
     @Transactional

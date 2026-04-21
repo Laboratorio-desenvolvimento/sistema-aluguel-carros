@@ -347,7 +347,6 @@ export default function Veiculos() {
           ))}
         </div>
 
-        {/* Painel de Busca por Data */}
         <div className="max-w-3xl mx-auto mb-12 bg-bg-card/30 backdrop-blur-md border border-slate-800 rounded-3xl p-6 shadow-xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
             <div className="space-y-2">

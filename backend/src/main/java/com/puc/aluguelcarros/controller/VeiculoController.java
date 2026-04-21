@@ -9,6 +9,9 @@ import io.micronaut.http.annotation.Error;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.convert.format.Format;
+import java.util.Date;
 import java.util.List;
 
 @Controller("/veiculo")
@@ -30,7 +33,12 @@ public class VeiculoController {
 
     @Get
     @Status(HttpStatus.OK)
-    public List<Veiculo> listar() {
+    public List<Veiculo> listar(
+            @QueryValue @Nullable @Format("yyyy-MM-dd") Date inicio,
+            @QueryValue @Nullable @Format("yyyy-MM-dd") Date fim) {
+        if (inicio != null && fim != null) {
+            return veiculoService.listarDisponiveis(inicio, fim);
+        }
         return veiculoService.listarTodos();
     }
 

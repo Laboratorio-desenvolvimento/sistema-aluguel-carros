@@ -1,4 +1,5 @@
 package com.puc.aluguelcarros.facade;
+
 import com.puc.aluguelcarros.model.Agente;
 import com.puc.aluguelcarros.model.Cliente;
 import com.puc.aluguelcarros.model.Pedido;
@@ -6,8 +7,10 @@ import com.puc.aluguelcarros.model.UsuarioSistema;
 import com.puc.aluguelcarros.service.PedidoService;
 import com.puc.aluguelcarros.service.ClienteService;
 import com.puc.aluguelcarros.service.VeiculoService;
+import com.puc.aluguelcarros.service.AgenteService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.java.Log;
@@ -19,12 +22,15 @@ import java.util.ArrayList;
 public class PedidoFacade {
     @Inject
     private PedidoService pedidoService;
-    
+
     @Inject
     private ClienteService clienteService;
-    
+
     @Inject
     private VeiculoService veiculoService;
+
+    @Inject
+    private AgenteService agenteService;
 
     public HttpResponse<List<Pedido>> listarTodos() {
         try {
@@ -44,36 +50,56 @@ public class PedidoFacade {
         }
     }
 
-    public HttpResponse<Pedido> criarPedido(Pedido pedido) {
+    public HttpResponse<?> criarPedido(Pedido pedido) {
         try {
-            // Buscar cliente completo pelo ID
             Cliente cliente = clienteService.listarTodos().stream()
-                .filter(c -> c.getId().equals(pedido.getCliente().getId()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-            
-            // Buscar veículo completo pelo ID
-            var veiculo = veiculoService.listarTodos().stream()
-                .filter(v -> v.getId().equals(pedido.getVeiculo().getId()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
+                    .filter(c -> c.getId().equals(pedido.getCliente().getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-            // Verificar se o carro está disponível para as datas solicitadas
-            boolean isDisponivel = pedidoService.verificarDisponibilidade(veiculo, pedido.getDataInicioDesejada(), pedido.getDataFimDesejada());
-            if (!isDisponivel) {
-                return HttpResponse.status(HttpStatus.CONFLICT).body(null);
+            var veiculo = veiculoService.listarTodos().stream()
+                    .filter(v -> v.getId().equals(pedido.getVeiculo().getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
+
+            Agente agente = null;
+            if (pedido.getAgente() != null && pedido.getAgente().getId() != null) {
+                agente = agenteService.listarTodos().stream()
+                        .filter(a -> a.getId().equals(pedido.getAgente().getId()))
+                        .findFirst()
+                        .orElse(null);
             }
 
-            // Criar o pedido
-            Pedido novoPedido = pedidoService.criarPedido(cliente, veiculo, pedido.getDataInicioDesejada(), pedido.getDataFimDesejada());
+            boolean isDisponivel = pedidoService.verificarDisponibilidade(veiculo, pedido.getDataInicioDesejada(),
+                    pedido.getDataFimDesejada());
+            if (!isDisponivel) {
+                return HttpResponse.status(HttpStatus.CONFLICT)
+                        .body(new ErroDTO("Veículo não disponível para este período"));
+            }
+
+            Pedido novoPedido = pedidoService.criarPedido(cliente, veiculo, agente, pedido.getDataInicioDesejada(),
+                    pedido.getDataFimDesejada());
             return HttpResponse.status(HttpStatus.CREATED).body(novoPedido);
         } catch (Exception e) {
             e.printStackTrace();
-            return HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return HttpResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErroDTO(e.getMessage()));
         }
     }
 
-    public HttpResponse<Pedido> cancelarPedido(Pedido pedido) {
+    @Serdeable
+    public static class ErroDTO {
+        private String mensagem;
+
+        public ErroDTO(String mensagem) {
+            this.mensagem = mensagem;
+        }
+
+        public String getMensagem() {
+            return mensagem;
+        }
+    }
+
+    public HttpResponse<?> cancelarPedido(Pedido pedido) {
         try {
             pedidoService.cancelarPedido(pedido);
             return HttpResponse.ok();
@@ -82,7 +108,7 @@ public class PedidoFacade {
         }
     }
 
-    public HttpResponse<Pedido> reprovarPedido(Pedido pedido) {
+    public HttpResponse<?> reprovarPedido(Pedido pedido) {
         try {
             pedidoService.reprovarPedido(pedido);
             return HttpResponse.ok();
@@ -97,10 +123,10 @@ public class PedidoFacade {
         }
         if (usuario instanceof Cliente) {
             return pedidoService.getPedidosByClients((Cliente) usuario);
-        } 
-        
+        }
+
         if (usuario instanceof Agente) {
-            return pedidoService.getPedidosByAgente((Agente)usuario);
+            return pedidoService.getPedidosByAgente((Agente) usuario);
         }
         return new ArrayList<>();
     }
@@ -109,7 +135,7 @@ public class PedidoFacade {
         return pedidoService.getPedidoById(id);
     }
 
-    public HttpResponse<Pedido> executarPedido(Pedido pedido){
+    public HttpResponse<?> executarPedido(Pedido pedido) {
         try {
             HttpStatus status = pedidoService.executarPedido(pedido);
             if (status == HttpStatus.OK) {
@@ -122,21 +148,21 @@ public class PedidoFacade {
         }
     }
 
-    public HttpResponse<Pedido> modificarPedido(Pedido pedido, UsuarioSistema usuario){
-        if(pedido == null || usuario == null){
+    public HttpResponse<?> modificarPedido(Pedido pedido, UsuarioSistema usuario) {
+        if (pedido == null || usuario == null) {
             return HttpResponse.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        if(usuario instanceof Cliente){
+        if (usuario instanceof Cliente) {
             Pedido pedidoModificado = pedidoService.modificarPedido((Cliente) usuario, pedido);
-            if(pedidoModificado != null){
+            if (pedidoModificado != null) {
                 return HttpResponse.ok(pedidoModificado);
             } else {
                 return HttpResponse.status(HttpStatus.BAD_REQUEST).body(null);
             }
-        } else if(usuario instanceof Agente){
+        } else if (usuario instanceof Agente) {
             Pedido pedidoModificado = pedidoService.modificarPedido((Agente) usuario, pedido);
-            if(pedidoModificado != null){
+            if (pedidoModificado != null) {
                 return HttpResponse.ok(pedidoModificado);
             } else {
                 return HttpResponse.status(HttpStatus.BAD_REQUEST).body(null);
@@ -146,4 +172,12 @@ public class PedidoFacade {
         }
     }
 
+    public HttpResponse<?> assinarPedido(Long id, UsuarioSistema usuario) {
+        try {
+            Pedido pedido = pedidoService.assinarPedido(id, usuario);
+            return HttpResponse.ok(pedido);
+        } catch (Exception e) {
+            return HttpResponse.status(HttpStatus.BAD_REQUEST).body(new ErroDTO(e.getMessage()));
+        }
+    }
 }
