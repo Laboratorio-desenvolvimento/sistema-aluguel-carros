@@ -12,24 +12,20 @@ import java.util.List;
 public class VeiculoService {
 
     private final VeiculoRepository veiculoRepository;
-    private final PedidoService pedidoService;
 
-    public VeiculoService(VeiculoRepository veiculoRepository, PedidoService pedidoService) {
+    public VeiculoService(VeiculoRepository veiculoRepository) {
         this.veiculoRepository = veiculoRepository;
-        this.pedidoService = pedidoService;
     }
 
     public List<Veiculo> listarTodos() {
         return veiculoRepository.findAll();
     }
 
-    public List<Veiculo> listarDisponiveis(java.util.Date inicio, java.util.Date fim) {
-        List<Veiculo> todos = veiculoRepository.findAll();
-        if (inicio == null || fim == null) return todos;
+    public List<Veiculo> listarDisponiveis(java.util.Date inicio, java.util.Date fim, Long excludeId) {
+        if (inicio == null || fim == null)
+            return veiculoRepository.findAll();
 
-        return todos.stream()
-            .filter(v -> pedidoService.verificarDisponibilidade(v, inicio, fim))
-            .toList();
+        return veiculoRepository.findDisponiveis(inicio, fim, excludeId);
     }
 
     @Transactional
@@ -72,7 +68,7 @@ public class VeiculoService {
         existente.setItens(veiculoAtualizado.getItens());
         existente.setFoto(veiculoAtualizado.getFoto());
         existente.setAgente(veiculoAtualizado.getAgente());
-        
+
         if (veiculoAtualizado.getValorDia() != null) {
             existente.setValorDia(veiculoAtualizado.getValorDia());
         }

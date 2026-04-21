@@ -22,6 +22,15 @@ import java.time.ZoneId;
 public class PedidoService {
     private final PedidoRepository finalRepository;
 
+    @jakarta.inject.Inject
+    private com.puc.aluguelcarros.repository.ClienteRepository clienteRepository;
+
+    @jakarta.inject.Inject
+    private com.puc.aluguelcarros.repository.VeiculoRepository veiculoRepository;
+
+    @jakarta.inject.Inject
+    private com.puc.aluguelcarros.repository.AgenteRepository agenteRepository;
+
     public PedidoService(PedidoRepository repository) {
         this.finalRepository = repository;
     }
@@ -46,6 +55,13 @@ public class PedidoService {
         return pedidos;
     }
 
+    public List<Pedido> getPedidos(UsuarioSistema usuario) {
+        if (usuario == null) return new java.util.ArrayList<>();
+        if (usuario instanceof Cliente) return getPedidosByClients((Cliente) usuario);
+        if (usuario instanceof Agente) return getPedidosByAgente((Agente) usuario);
+        return new java.util.ArrayList<>();
+    }
+
     public Pedido getPedidoById(Long id) {
         return finalRepository.findById(id).orElseThrow(() -> new PersistenceException("Pedido não encontrado"));
     }
@@ -58,51 +74,40 @@ public class PedidoService {
     }
 
     @Transactional
-    public Pedido modificarPedido(Cliente cliente, Pedido pedidoAtualizado) {
-        Pedido pedidoExistente = finalRepository.findByIdAndCliente(pedidoAtualizado.getId(), cliente)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado para o cliente."));
-        pedidoExistente.setContrato(pedidoAtualizado.getContrato());
-        return finalRepository.update(pedidoExistente);
-    }
-
-    @Transactional
-    public Pedido modificarPedido(Agente agente, Pedido pedidoAtualizado) {
-        Pedido pedidoExistente = finalRepository.findByIdAndAgente(pedidoAtualizado.getId(), agente)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado para o agente."));
-        pedidoExistente.setContrato(pedidoAtualizado.getContrato());
-        return finalRepository.update(pedidoExistente);
-    }
-
-    @Transactional
-    public Pedido criarPedido(Cliente cliente, Veiculo veiculo, Agente agente, Date inicio, Date fim) {
-        if (cliente == null || veiculo == null || inicio == null || fim == null) {
-            throw new IllegalArgumentException("Todos os campos (cliente, veículo, datas) são obrigatórios.");
+    public Pedido criarPedido(Pedido pedido) {
+        if (pedido.getCliente() == null || pedido.getVeiculo() == null || 
+            pedido.getDataInicioDesejada() == null || pedido.getDataFimDesejada() == null) {
+            throw new IllegalArgumentException("Campos obrigatórios ausentes.");
         }
 
-        LocalDate localInicio = inicio.toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
-        LocalDate localFim = fim.toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+        Cliente cliente = clienteRepository.findById(pedido.getCliente().getId())
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        Veiculo veiculo = veiculoRepository.findById(pedido.getVeiculo().getId())
+                .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
+
+        Agente agente = null;
+        if (pedido.getAgente() != null && pedido.getAgente().getId() != null) {
+            agente = agenteRepository.findById(pedido.getAgente().getId())
+                    .orElse(null);
+        }
+
+        LocalDate localInicio = pedido.getDataInicioDesejada().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+        LocalDate localFim = pedido.getDataFimDesejada().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
         LocalDate localHoje = LocalDate.now(ZoneId.of("UTC"));
 
-        if (localInicio.isAfter(localFim)) {
-            throw new IllegalArgumentException("A data de início não pode ser posterior à data de término.");
+        if (localInicio.isAfter(localFim)) throw new IllegalArgumentException("Início após o fim.");
+        if (localInicio.isBefore(localHoje)) throw new IllegalArgumentException("Início no passado.");
+
+        if (!verificarDisponibilidade(veiculo, pedido.getDataInicioDesejada(), pedido.getDataFimDesejada())) {
+            throw new RuntimeException("Veículo indisponível.");
         }
 
-        if (localInicio.isBefore(localHoje)) {
-            throw new IllegalArgumentException("A data de início deve ser a partir de hoje.");
-        }
-
-        if (!verificarDisponibilidade(veiculo, inicio, fim)) {
-            throw new RuntimeException("Veículo não está disponível para o período selecionado.");
-        }
-
-        Pedido pedido = new Pedido();
         pedido.setCliente(cliente);
         pedido.setVeiculo(veiculo);
         pedido.setAgente(agente);
-        pedido.setDataInicioDesejada(inicio);
-        pedido.setDataFimDesejada(fim);
         pedido.setDataSolicitacao(new Date());
-        pedido.setStatus(StatusPedido.INTRODUCED);
+        pedido.setStatus(StatusPedido.PENDING);
 
         return finalRepository.save(pedido);
     }
@@ -122,6 +127,7 @@ public class PedidoService {
         }
 
         pedido.setStatus(StatusPedido.CANCELLED);
+        pedido.setDataCancelamento(new Date());
         return finalRepository.update(pedido);
     }
 
@@ -141,13 +147,11 @@ public class PedidoService {
     }
 
     @Transactional
-    public HttpResponse<Pedido> reprovarPedido(Pedido pedido) {
-        if (pedido == null) {
-            return HttpResponse.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
-        pedido.setStatus(StatusPedido.REJECTED);
-        return HttpResponse.ok(finalRepository.update(pedido));
+    public Pedido reprovarPedido(Pedido pedido) {
+        if (pedido == null) throw new IllegalArgumentException("Pedido nulo.");
+        Pedido pedidoExistente = getPedidoById(pedido.getId());
+        pedidoExistente.setStatus(StatusPedido.REJECTED);
+        return finalRepository.update(pedidoExistente);
     }
 
     @Transactional
@@ -172,15 +176,52 @@ public class PedidoService {
         return finalRepository.update(pedido);
     }
 
+    @Transactional
+    public Pedido editarPedido(Long id, Pedido pedidoAtualizado, Cliente cliente) {
+        Pedido pedido = finalRepository.findByIdAndCliente(id, cliente)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado ou não pertence ao cliente."));
+
+        if (pedido.getStatus() != StatusPedido.PENDING) {
+            throw new RuntimeException("Apenas pedidos pendentes podem ser editados.");
+        }
+
+        Veiculo veiculo = veiculoRepository.findById(pedidoAtualizado.getVeiculo().getId())
+                .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
+
+        LocalDate localInicio = pedidoAtualizado.getDataInicioDesejada().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+        LocalDate localFim = pedidoAtualizado.getDataFimDesejada().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
+        LocalDate localHoje = LocalDate.now(ZoneId.of("UTC"));
+
+        if (localInicio.isAfter(localFim)) throw new IllegalArgumentException("Início após o fim.");
+        if (localInicio.isBefore(localHoje)) throw new IllegalArgumentException("Início no passado.");
+
+        if (!verificarDisponibilidade(veiculo, pedidoAtualizado.getDataInicioDesejada(), pedidoAtualizado.getDataFimDesejada(), pedido.getId())) {
+            throw new RuntimeException("Veículo indisponível.");
+        }
+
+        pedido.setVeiculo(veiculo);
+        pedido.setDataInicioDesejada(pedidoAtualizado.getDataInicioDesejada());
+        pedido.setDataFimDesejada(pedidoAtualizado.getDataFimDesejada());
+
+        return finalRepository.update(pedido);
+    }
+
     public boolean verificarDisponibilidade(Veiculo veiculo, Date dataInicio, Date dataFim) {
+        return verificarDisponibilidade(veiculo, dataInicio, dataFim, null);
+    }
+
+    public boolean verificarDisponibilidade(Veiculo veiculo, Date dataInicio, Date dataFim, Long excludePedidoId) {
         LocalDate localInicio = dataInicio.toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
         LocalDate localFim = dataFim.toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
 
         List<Pedido> pedidos = finalRepository.findByVeiculo(veiculo);
         for (Pedido pedido : pedidos) {
+            if (excludePedidoId != null && pedido.getId().equals(excludePedidoId)) {
+                continue;
+            }
             if (pedido.getStatus() == StatusPedido.APPROVED ||
                     pedido.getStatus() == StatusPedido.UNDER_REVIEW ||
-                    pedido.getStatus() == StatusPedido.INTRODUCED ||
+                    pedido.getStatus() == StatusPedido.PENDING ||
                     pedido.getStatus() == StatusPedido.COMPLETED) {
 
                 LocalDate resInicio = pedido.getDataInicioDesejada().toInstant().atZone(ZoneId.of("UTC")).toLocalDate();
