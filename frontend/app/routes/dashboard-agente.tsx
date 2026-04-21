@@ -10,7 +10,7 @@ export function meta({}: Route.MetaArgs) {
     ];
 }
 
-export default function DashboardCliente() {
+export default function DashboardAgente() {
     const [user, setUser] = useState<{ id: number; nome: string; email: string } | null>(null);
 
     useEffect(() => {
