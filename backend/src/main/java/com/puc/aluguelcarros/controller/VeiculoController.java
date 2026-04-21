@@ -35,9 +35,10 @@ public class VeiculoController {
     @Status(HttpStatus.OK)
     public List<Veiculo> listar(
             @QueryValue @Nullable @Format("yyyy-MM-dd") Date inicio,
-            @QueryValue @Nullable @Format("yyyy-MM-dd") Date fim) {
+            @QueryValue @Nullable @Format("yyyy-MM-dd") Date fim,
+            @QueryValue @Nullable Long excludeId) {
         if (inicio != null && fim != null) {
-            return veiculoService.listarDisponiveis(inicio, fim);
+            return veiculoService.listarDisponiveis(inicio, fim, excludeId);
         }
         return veiculoService.listarTodos();
     }

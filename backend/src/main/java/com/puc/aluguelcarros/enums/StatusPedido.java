@@ -1,7 +1,7 @@
 package com.puc.aluguelcarros.enums;
 
 public enum StatusPedido {
-    INTRODUCED("Introduzido"),
+    PENDING("Pendente"),
     UNDER_REVIEW("Em Análise"),
     APPROVED("Aprovado"),
     REJECTED("Rejeitado"),

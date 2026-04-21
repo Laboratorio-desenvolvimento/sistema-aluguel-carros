@@ -17,7 +17,9 @@ public class Pedido{
     private Date dataInicioDesejada;
     private Date dataFimDesejada;
     @Enumerated(EnumType.STRING)
-    private StatusPedido status;
+    @Column(columnDefinition = "VARCHAR(255) DEFAULT 'PENDING'")
+    private StatusPedido status = StatusPedido.PENDING;
+    private Date dataCancelamento;
     @OneToOne
     @JoinColumn(name = "contrato_id")
     private Contrato contrato;

@@ -141,7 +141,7 @@ export default function Veiculos() {
         dataInicioDesejada: new Date(dataInicial).toISOString(),
         dataFimDesejada: new Date(dataFinal).toISOString(),
         dataSolicitacao: new Date().toISOString(),
-        status: "INTRODUCED",
+        status: "PENDING",
       };
 
       console.log("Enviando reserva:", reserva);

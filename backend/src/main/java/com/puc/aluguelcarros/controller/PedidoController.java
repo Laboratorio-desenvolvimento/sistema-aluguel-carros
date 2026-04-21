@@ -8,9 +8,6 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
-import com.puc.aluguelcarros.model.UsuarioSistema;
-import com.puc.aluguelcarros.repository.UsuarioSistemaRepository;
-import jakarta.inject.Inject;
 import java.util.List;
 
 @Controller("/pedidos")
@@ -21,9 +18,6 @@ public class PedidoController {
     public PedidoController(PedidoFacade pedidoFacace) {
         this.pedidoFacace = pedidoFacace;
     }
-
-    @Inject
-    private UsuarioSistemaRepository usuarioRepository;
 
     @Get
     @Secured("AGENTE")
@@ -98,17 +92,15 @@ public class PedidoController {
     @Secured({ "CLIENTE", "AGENTE" })
     @Status(HttpStatus.OK)
     public HttpResponse<?> assinarPedido(@PathVariable Long id, Authentication authentication) {
-        Object userIdObj = authentication.getAttributes().get("userId");
-        if (userIdObj == null) {
-            return HttpResponse.status(HttpStatus.UNAUTHORIZED)
-                    .body(new PedidoFacade.ErroDTO("Usuário não identificado"));
-        }
-        Long userId = Long.parseLong(userIdObj.toString());
-        UsuarioSistema usuario = usuarioRepository.findById(userId).orElse(null);
-        if (usuario == null) {
-            return HttpResponse.status(HttpStatus.NOT_FOUND)
-                    .body(new PedidoFacade.ErroDTO("Usuário não encontrado no sistema"));
-        }
-        return pedidoFacace.assinarPedido(id, usuario);
+        Long userId = Long.parseLong(authentication.getAttributes().get("userId").toString());
+        return pedidoFacace.assinarPedido(id, userId);
+    }
+
+    @Put("/{id}")
+    @Secured("CLIENTE")
+    @Status(HttpStatus.OK)
+    public HttpResponse<?> editarPedido(@PathVariable Long id, @Body Pedido pedido, Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getAttributes().get("userId").toString());
+        return pedidoFacace.editarPedido(id, pedido, userId);
     }
 }
