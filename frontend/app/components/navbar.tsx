@@ -77,15 +77,6 @@ export default function Navbar() {
                                             </div>
 
                                             <div className="space-y-1">
-                                                <a
-                                                    href="/perfil"
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-text-main/80 hover:bg-primary/10 hover:text-primary rounded-xl transition-all duration-200 group"
-                                                >
-                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                                                        <User size={16} />
-                                                    </div>
-                                                    <span className="font-semibold">Meu Perfil</span>
-                                                </a>
 
                                                 {user.tipo === "AGENTE" ? (
                                                     <a
