@@ -72,7 +72,12 @@ export default function Login() {
     try {
       const payload = await authService.login(loginData);
 
-      localStorage.setItem("vrumvrum_usuario", JSON.stringify({ id: payload.id, nome: payload.nome, email: payload.email }));
+      localStorage.setItem("vrumvrum_usuario", JSON.stringify({ 
+        id: payload.id, 
+        nome: payload.nome, 
+        email: payload.email,
+        tipo: payload.tipo 
+      }));
       setSuccessMessage(`Bem-vindo(a), ${payload.nome}! Redirecionando...`);
       setLoginData({ email: "", senha: "" });
       setTimeout(() => { window.location.href = redirectTo; }, 1200);
@@ -85,8 +90,8 @@ export default function Login() {
 
   return (
     <div className="flex-1 flex items-center justify-center p-4 min-h-[calc(100vh-75px)]">
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 dark:ring-1 dark:ring-slate-700 rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8 text-center">
+      <div className="w-full max-w-md bg-bg-card ring-1 ring-slate-700/50 rounded-lg shadow-md p-8">
+        <h1 className="text-2xl font-bold text-text-main mb-8 text-center">
           Login
         </h1>
 
@@ -104,7 +109,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-text-main/80 mb-1">
               Email
             </label>
             <input
@@ -113,13 +118,13 @@ export default function Login() {
               name="email"
               value={loginData.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-3 py-2 border border-slate-600 bg-bg-card/50 text-text-main placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
               placeholder="seu.email@exemplo.com"
             />
           </div>
 
           <div>
-            <label htmlFor="senha" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            <label htmlFor="senha" className="block text-sm font-medium text-text-main/80 mb-1">
               Senha
             </label>
             <input
@@ -128,7 +133,7 @@ export default function Login() {
               name="senha"
               value={loginData.senha}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-3 py-2 border border-slate-600 bg-bg-card/50 text-text-main placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
               placeholder="Digite sua senha"
             />
           </div>
@@ -136,18 +141,18 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-black font-bold py-2 px-4 rounded-md transition-colors duration-200"
+            className="w-full mt-6 bg-primary hover:bg-primary/90 disabled:bg-yellow-300 text-black font-bold py-2 px-4 rounded-md transition-colors duration-200"
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
 
-        <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
+        <div className="mt-4 text-center text-sm text-text-main/80">
           <p>
-            Ainda não tem conta? <a href="/cadastro" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline">Cadastre-se</a>
+            Ainda não tem conta? <a href="/cadastro" className="text-primary font-semibold hover:underline">Cadastre-se</a>
           </p>
           <p className="mt-2 text-center flex justify-center">
-            <a href="/" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline inline-flex items-center gap-1">
+            <a href="/" className="text-primary font-semibold hover:underline inline-flex items-center gap-1">
               <Home size={14} /> Voltar para home
             </a>
           </p>

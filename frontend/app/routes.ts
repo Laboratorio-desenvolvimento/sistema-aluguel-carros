@@ -3,10 +3,8 @@ import { type RouteConfig, index, route } from "@react-router/dev/routes";
 export default [
   index("routes/home.tsx"),
   route("login", "routes/login.tsx"),
-  route("dashboard-cliente", "routes/dashboard-cliente.tsx"),
-  route("cadastro-veiculo", "routes/cadastro-veiculo.tsx"),
+  route("dashboard", "routes/dashboard.tsx"),
+  route("pedidos", "routes/pedidos.tsx"),
   route("cadastro", "routes/cadastro.tsx"),
   route("veiculos", "routes/veiculos.tsx"),
-  route("reservas-cliente", "routes/reservas-cliente.tsx"),
-  route("dashboard-agente", "routes/dashboard-agente.tsx"),
 ] satisfies RouteConfig;

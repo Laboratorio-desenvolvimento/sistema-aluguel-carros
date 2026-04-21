@@ -2,12 +2,9 @@ import { useEffect, useState } from "react";
 import { authService } from "~/services/auth.service";
 
 export default function Navbar() {
-    const [theme, setTheme] = useState<string | null>(null);
-    const [user, setUser] = useState<{ id: number; nome: string; email: string } | null>(null);
+    const [user, setUser] = useState<{ id: number; nome: string; email: string; tipo: "CLIENTE" | "AGENTE" } | null>(null);
 
     useEffect(() => {
-        setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
-        
         const token = authService.getToken();
         const storedUser = localStorage.getItem("vrumvrum_usuario");
         if (token && storedUser) {
@@ -15,18 +12,7 @@ export default function Navbar() {
         }
     }, []);
 
-    const toggleTheme = () => {
-        const isDark = document.documentElement.classList.contains("dark");
-        if (isDark) {
-            document.documentElement.classList.remove("dark");
-            localStorage.theme = "light";
-            setTheme("light");
-        } else {
-            document.documentElement.classList.add("dark");
-            localStorage.theme = "dark";
-            setTheme("dark");
-        }
-    };
+
 
     const handleLogout = () => {
         authService.logout();
@@ -35,7 +21,7 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 shadow-sm sticky top-0 z-50 transition-all duration-300 py-1">
+        <nav className="bg-bg-main/90 backdrop-blur-md border-b border-slate-700/50 shadow-sm sticky top-0 z-50 transition-all duration-300 py-1">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     <a href="/" className="flex items-center gap-3 group">
@@ -50,25 +36,31 @@ export default function Navbar() {
                             <circle cx="8" cy="18" r="1.5" className="fill-yellow-500" />
                             <circle cx="18" cy="18" r="1.5" className="fill-yellow-500" />
                         </svg>
-                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter font-racing italic transition-colors">VrumVrum</h1>
+                        <h1 className="text-3xl font-black text-text-main tracking-tighter font-racing italic transition-colors">VrumVrum</h1>
                     </a>
 
                     <div className="flex items-center gap-8">
                         <div className="hidden md:flex items-center gap-8">
-                            <a href="/" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
+                            <a href="/" className="text-text-main/80 hover:text-primary font-bold uppercase tracking-widest text-sm transition-colors">
                                 Início
                             </a>
 
-                            <a href="/veiculos" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
+                            <a href="/veiculos" className="text-text-main/80 hover:text-primary font-bold uppercase tracking-widest text-sm transition-colors">
                                 Veículos
                             </a>
 
                             {user ? (
                                 <>
-                                    <a href="/reservas-cliente" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
-                                        Pedidos
-                                    </a>
-                                    <span className="text-yellow-600 dark:text-yellow-500 font-bold tracking-widest text-sm border-l border-gray-300 dark:border-slate-700 pl-8">
+                                    {user.tipo === "CLIENTE" ? (
+                                        <a href="/pedidos" className="text-text-main/80 hover:text-primary font-bold uppercase tracking-widest text-sm transition-colors">
+                                            Pedidos
+                                        </a>
+                                    ) : (
+                                        <a href="/dashboard" className="text-text-main/80 hover:text-primary font-bold uppercase tracking-widest text-sm transition-colors">
+                                            Dashboard
+                                        </a>
+                                    )}
+                                    <span className="text-primary font-bold tracking-widest text-sm border-l border-slate-700 pl-8">
                                         Olá, {user.nome.split(" ")[0]}
                                     </span>
                                     <button onClick={handleLogout} className="text-red-500 hover:text-red-600 font-bold uppercase tracking-widest text-sm transition-colors cursor-pointer">
@@ -77,11 +69,11 @@ export default function Navbar() {
                                 </>
                             ) : (
                                 <>
-                                    <a href="/login" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors border-l border-gray-300 dark:border-slate-700 pl-8">
+                                    <a href="/login" className="text-text-main/80 hover:text-primary font-bold uppercase tracking-widest text-sm transition-colors border-l border-slate-700 pl-8">
                                         Login
                                     </a>
 
-                                    <a href="/cadastro" className="text-gray-600 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 font-bold uppercase tracking-widest text-sm transition-colors">
+                                    <a href="/cadastro" className="text-text-main/80 hover:text-primary font-bold uppercase tracking-widest text-sm transition-colors">
                                         Cadastro
                                     </a>
                                 </>

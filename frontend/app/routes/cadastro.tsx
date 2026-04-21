@@ -55,9 +55,9 @@ const formatCNPJ = (value: string) =>
     .slice(0, 18);
 
 const inputCls =
-  "w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500";
+  "w-full px-3 py-2 border border-slate-600 bg-bg-card/50 text-text-main placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50";
 
-const labelCls = "block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1";
+const labelCls = "block text-sm font-medium text-gray-200 mb-1";
 
 export default function Cadastro() {
   const [activeTab, setActiveTab] = useState<TabType>("cliente");
@@ -161,7 +161,12 @@ export default function Cadastro() {
 
       const tipo = isCliente ? "Cliente" : "Agente";
       setSuccessMessage(`${tipo} cadastrado com sucesso! Logando...`);
-      localStorage.setItem("vrumvrum_usuario", JSON.stringify({ id: payload.id, nome: payload.nome, email: payload.email }));
+      localStorage.setItem("vrumvrum_usuario", JSON.stringify({ 
+        id: payload.id, 
+        nome: payload.nome, 
+        email: payload.email,
+        tipo: isCliente ? "CLIENTE" : "AGENTE"
+      }));
       
       if (isCliente) {
         setClienteData({ nome: "", email: "", senha: "", rg: "", cpf: "", profissao: "" });
@@ -186,20 +191,20 @@ export default function Cadastro() {
 
   return (
     <div className="flex-1 flex items-center justify-center p-4 min-h-[calc(100vh-75px)] py-12">
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 dark:ring-1 dark:ring-slate-700 rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
+      <div className="w-full max-w-md bg-bg-card ring-1 ring-slate-700/50 rounded-lg shadow-md p-8">
+        <h1 className="text-2xl font-bold text-text-main mb-6 text-center">
           Cadastro
         </h1>
 
-        <div className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 mb-6">
+        <div className="flex rounded-lg overflow-hidden border border-slate-700 mb-6">
           <button
             id="tab-cliente"
             type="button"
             onClick={() => switchTab("cliente")}
             className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold transition-colors duration-200 ${
               activeTab === "cliente"
-                ? "bg-yellow-500 text-black"
-                : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-slate-700"
+                ? "bg-primary text-black"
+                : "bg-bg-card text-text-main/80 hover:bg-bg-card/80"
             }`}
           >
             <User size={15} /> Cliente
@@ -208,10 +213,10 @@ export default function Cadastro() {
             id="tab-agente"
             type="button"
             onClick={() => switchTab("agente")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold transition-colors duration-200 border-l border-gray-200 dark:border-slate-700 ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold transition-colors duration-200 border-l border-slate-700 ${
               activeTab === "agente"
-                ? "bg-yellow-500 text-black"
-                : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-slate-700"
+                ? "bg-primary text-black"
+                : "bg-bg-card text-text-main/80 hover:bg-bg-card/80"
             }`}
           >
             <Building2 size={15} /> Agente
@@ -351,23 +356,23 @@ export default function Cadastro() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-black font-bold py-2 px-4 rounded-md transition-colors duration-200"
+            className="w-full mt-2 bg-primary hover:bg-primary-hover disabled:opacity-50 text-black font-bold py-2 px-4 rounded-md transition-colors duration-200"
           >
             {loading ? "Cadastrando..." : "Cadastrar"}
           </button>
         </form>
 
-        <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
+        <div className="mt-4 text-center text-sm text-text-main/80">
           <p>
             Já tem cadastro?{" "}
-            <a href="/login" className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline">
+            <a href="/login" className="text-primary font-semibold hover:underline">
               Faça login
             </a>
           </p>
           <p className="mt-2 text-center flex justify-center">
             <a
               href="/"
-              className="text-yellow-600 dark:text-yellow-500 font-semibold hover:underline inline-flex items-center gap-1"
+              className="text-primary font-semibold hover:underline inline-flex items-center gap-1"
             >
               <Home size={14} /> Voltar para home
             </a>

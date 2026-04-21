@@ -84,6 +84,10 @@ public class PedidoService {
             throw new IllegalArgumentException("A data de início deve ser a partir de hoje.");
         }
 
+        if (!verificarDisponibilidade(veiculo, inicio, fim)) {
+            throw new RuntimeException("Veículo não está disponível para o período selecionado.");
+        }
+
         Pedido pedido = new Pedido();
         pedido.setCliente(cliente);
         pedido.setVeiculo(veiculo);
@@ -157,7 +161,9 @@ public class PedidoService {
     public boolean verificarDisponibilidade(Veiculo veiculo, Date dataInicio, Date dataFim) {
         List<Pedido> pedidos = finalRepository.findByVeiculo(veiculo);
         for (Pedido pedido : pedidos) {
-            if (pedido.getStatus() == StatusPedido.APPROVED || pedido.getStatus() == StatusPedido.UNDER_REVIEW) {
+            if (pedido.getStatus() == StatusPedido.APPROVED || 
+                pedido.getStatus() == StatusPedido.UNDER_REVIEW || 
+                pedido.getStatus() == StatusPedido.INTRODUCED) {
                 if (dataInicio.before(pedido.getDataFimDesejada()) && dataFim.after(pedido.getDataInicioDesejada())) {
                     return false;
                 }

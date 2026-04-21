@@ -158,20 +158,20 @@ export default function Veiculos() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center min-h-[calc(100vh-75px)] bg-slate-950/90 backdrop-blur-md">
-        <div className="w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 flex items-center justify-center min-h-[calc(100vh-75px)]">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex-1 min-h-[calc(100vh-75px)] bg-slate-950/90 backdrop-blur-md py-10 px-4">
+    <div className="flex-1 min-h-[calc(100vh-75px)] py-10 px-4">
       {/* Modal de Reserva */}
       {modalAberto && veiculoSelecionado && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 rounded-2xl border border-slate-700 shadow-2xl max-w-md w-full">
+          <div className="bg-bg-card rounded-2xl border border-slate-700 shadow-2xl max-w-md w-full">
             {/* Header */}
-            <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 p-6 rounded-t-2xl">
+            <div className="bg-gradient-to-r from-primary to-primary-hover p-6 rounded-t-2xl">
               <h2 className="text-2xl font-bold text-black">Reservar Veículo</h2>
               <p className="text-black/80 text-sm mt-1">
                 {veiculoSelecionado.marca} {veiculoSelecionado.modelo}
@@ -181,22 +181,22 @@ export default function Veiculos() {
             {/* Body */}
             <div className="p-6 space-y-5">
               {/* Informações do Veículo */}
-              <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
+              <div className="bg-bg-card/50 rounded-lg p-4 border border-slate-700/50">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-400 text-sm">Valor da diária:</span>
-                  <span className="text-xl font-bold text-yellow-400">
+                  <span className="text-xl font-bold text-primary">
                     R$ {(veiculoSelecionado?.valorDia || 0).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400 text-sm">Categoria:</span>
-                  <span className="text-white">{veiculoSelecionado?.categoria || "N/A"}</span>
+                  <span className="text-text-main">{veiculoSelecionado?.categoria || "N/A"}</span>
                 </div>
               </div>
 
               {/* Data Inicial */}
               <div>
-                <label className="block text-sm font-semibold text-white mb-2">
+                <label className="block text-sm font-semibold text-text-main mb-2">
                   Data Inicial
                 </label>
                 <input
@@ -204,13 +204,13 @@ export default function Veiculos() {
                   value={dataInicial}
                   onChange={(e) => setDataInicial(e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
-                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-text-main placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50"
                 />
               </div>
 
               {/* Data Final */}
               <div>
-                <label className="block text-sm font-semibold text-white mb-2">
+                <label className="block text-sm font-semibold text-text-main mb-2">
                   Data Final
                 </label>
                 <input
@@ -218,16 +218,16 @@ export default function Veiculos() {
                   value={dataFinal}
                   onChange={(e) => setDataFinal(e.target.value)}
                   min={dataInicial || new Date().toISOString().split("T")[0]}
-                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-text-main placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50"
                 />
               </div>
 
               {/* Cálculo de Dias */}
               {dataInicial && dataFinal && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <div className="bg-primary/10 border border-yellow-500/30 rounded-lg p-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-300">Número de dias:</span>
-                    <span className="text-lg font-bold text-yellow-400">
+                    <span className="text-text-main/80">Número de dias:</span>
+                    <span className="text-lg font-bold text-primary">
                       {Math.ceil(
                         (new Date(dataFinal).getTime() -
                           new Date(dataInicial).getTime()) /
@@ -237,8 +237,8 @@ export default function Veiculos() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t border-yellow-500/30">
-                    <span className="text-white font-semibold">Total:</span>
-                    <span className="text-2xl font-black text-yellow-400">
+                    <span className="text-text-main font-semibold">Total:</span>
+                    <span className="text-2xl font-black text-primary">
                       R${" "}
                       {(
                         (veiculoSelecionado?.valorDia || 0) *
@@ -255,16 +255,16 @@ export default function Veiculos() {
             </div>
 
             {/* Footer */}
-            <div className="bg-slate-800/50 p-6 rounded-b-2xl border-t border-slate-700 flex gap-3">
+            <div className="bg-bg-card/50 p-6 rounded-b-2xl border-t border-slate-700 flex gap-3">
               <button
                 onClick={handleFecharModal}
-                className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-colors"
+                className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-text-main font-semibold rounded-lg transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleConfirmarReserva}
-                className="flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 bg-primary hover:bg-primary-hover text-black font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 Confirmar <ArrowRight size={16} />
               </button>
@@ -276,10 +276,10 @@ export default function Veiculos() {
       <div className="max-w-7xl mx-auto">
 
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-racing text-yellow-300 italic mb-2">
-            Veículos <span className="text-white">disponíveis</span>
+          <h1 className="text-5xl font-racing text-primary italic mb-2">
+            Veículos <span className="text-text-main">disponíveis</span>
           </h1>
-          <p className="text-gray-300">
+          <p className="text-text-main/80">
             Escolha o veículo ideal para a sua próxima viagem.
           </p>
         </div>
@@ -290,8 +290,8 @@ export default function Veiculos() {
               key={cat}
               onClick={() => setFiltroCategoria(cat)}
               className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 ${filtroCategoria === cat
-                ? "bg-yellow-400 text-black border border-yellow-400"
-                : "bg-slate-900/50 backdrop-blur-md text-gray-300 border border-slate-700 hover:border-yellow-400"
+                ? "bg-primary text-black border border-yellow-400"
+                : "bg-bg-card/50 backdrop-blur-md text-text-main/80 border border-slate-700 hover:border-yellow-400"
                 }`}
             >
               {cat}
@@ -301,7 +301,7 @@ export default function Veiculos() {
 
         {veiculosFiltrados.length === 0 ? (
           <div className="flex flex-col items-center justify-center">
-            <h2 className="text-3xl font-racing text-white italic mb-2">Sem veículos!</h2>
+            <h2 className="text-3xl font-racing text-text-main italic mb-2">Sem veículos!</h2>
             <p className="text-gray-400 text-center text-lg">Ainda não possuímos veículos cadastrados no momento.<br />Volte a consultar em breve!</p>
           </div>
         ) : (
@@ -309,49 +309,49 @@ export default function Veiculos() {
             {veiculosFiltrados.map((v) => (
               <div
                 key={v.id}
-                className="bg-slate-900/40 backdrop-blur-md rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border border-slate-800 hover:border-yellow-500/50 flex flex-col group"
+                className="bg-bg-card/40 backdrop-blur-md rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border border-slate-800 hover:border-yellow-500/50 flex flex-col group"
               >
-                <div className="bg-slate-900 h-44 flex items-center justify-center relative overflow-hidden">
+                <div className="bg-bg-card h-44 flex items-center justify-center relative overflow-hidden">
                   {v.foto ? (
                     <img src={v.foto.startsWith("data:") ? v.foto : `data:image/jpeg;base64,${v.foto}`} alt={`${v.marca} ${v.modelo}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   ) : (
-                    <Car size={80} className="text-white/10" />
+                    <Car size={80} className="text-text-main/10" />
                   )}
                   {v.destaque && (
-                    <span className="absolute top-3 left-3 bg-yellow-400 text-black text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 z-10">
+                    <span className="absolute top-3 left-3 bg-primary text-black text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 z-10">
                       <Star size={11} fill="black" /> Destaque
                     </span>
                   )}
                   <div className="absolute bottom-3 right-3 bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1">
-                    <span className="text-white text-sm font-bold">{v.marca}</span>
+                    <span className="text-text-main text-sm font-bold">{v.marca}</span>
                   </div>
                 </div>
 
                 <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-start justify-between mb-1">
-                    <h2 className="text-lg font-bold text-white group-hover:text-yellow-300 transition-colors">{v.marca} {v.modelo}</h2>
-                    <div className="flex items-center gap-1 text-yellow-400 text-sm font-bold">
+                    <h2 className="text-lg font-bold text-text-main group-hover:text-primary transition-colors">{v.marca} {v.modelo}</h2>
+                    <div className="flex items-center gap-1 text-primary text-sm font-bold">
                       <Star size={14} fill="currentColor" /> {v.avaliacao ? v.avaliacao.toFixed(1) : "N/A"}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-xs bg-slate-800/80 text-gray-300 px-2 py-0.5 rounded-full">{v.categoria || "Geral"}</span>
+                    <span className="text-xs bg-slate-800/80 text-text-main/80 px-2 py-0.5 rounded-full">{v.categoria || "Geral"}</span>
                     <span className="text-xs text-gray-400">{v.ano}</span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="flex flex-col items-center bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg py-2">
-                      <Fuel size={16} className="text-yellow-400 mb-1" />
-                      <span className="text-xs text-gray-300">{v.combustivel || "N/A"}</span>
+                    <div className="flex flex-col items-center bg-bg-card/50 backdrop-blur-sm border border-slate-700/50 rounded-lg py-2">
+                      <Fuel size={16} className="text-primary mb-1" />
+                      <span className="text-xs text-text-main/80">{v.combustivel || "N/A"}</span>
                     </div>
-                    <div className="flex flex-col items-center bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg py-2">
-                      <Users size={16} className="text-yellow-400 mb-1" />
-                      <span className="text-xs text-gray-300">{v.lugares || "?"} lugares</span>
+                    <div className="flex flex-col items-center bg-bg-card/50 backdrop-blur-sm border border-slate-700/50 rounded-lg py-2">
+                      <Users size={16} className="text-primary mb-1" />
+                      <span className="text-xs text-text-main/80">{v.lugares || "?"} lugares</span>
                     </div>
-                    <div className="flex flex-col items-center bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-lg py-2">
-                      <Gauge size={16} className="text-yellow-400 mb-1" />
-                      <span className="text-xs text-gray-300">{v.potencia || "N/A"}</span>
+                    <div className="flex flex-col items-center bg-bg-card/50 backdrop-blur-sm border border-slate-700/50 rounded-lg py-2">
+                      <Gauge size={16} className="text-primary mb-1" />
+                      <span className="text-xs text-text-main/80">{v.potencia || "N/A"}</span>
                     </div>
                   </div>
 
@@ -359,7 +359,7 @@ export default function Veiculos() {
                     {(v.itens ? v.itens.split(",") : []).map((item) => (
                       <span
                         key={item.trim()}
-                        className="flex items-center gap-1 text-xs bg-yellow-400/10 text-yellow-300 border border-yellow-400/30 px-2 py-0.5 rounded-full"
+                        className="flex items-center gap-1 text-xs bg-primary/10 text-primary border border-yellow-400/30 px-2 py-0.5 rounded-full"
                       >
                         {itemIcon[item.trim()]} {item.trim()}
                       </span>
@@ -368,14 +368,14 @@ export default function Veiculos() {
 
                   <div className="mt-auto flex items-center justify-between">
                     <div>
-                      <span className="text-2xl font-black text-white font-racing">
+                      <span className="text-2xl font-black text-text-main font-racing">
                         R$ {v.valorDia ? v.valorDia.toFixed(2) : "0.00"}
                       </span>
                       <span className="text-sm text-gray-400">/dia</span>
                     </div>
                     <button
                       onClick={() => handleReservar(v)}
-                      className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-sm py-2 px-4 rounded-lg transition-colors duration-200"
+                      className="flex items-center gap-2 bg-primary hover:bg-yellow-600 text-black font-bold text-sm py-2 px-4 rounded-lg transition-colors duration-200"
                     >
                       Reservar <ArrowRight size={15} />
                     </button>

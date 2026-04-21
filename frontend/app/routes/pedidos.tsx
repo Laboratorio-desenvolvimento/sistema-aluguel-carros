@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Route } from "./+types/reservas-cliente";
+import type { Route } from "./+types/dashboard-cliente";
 import {
   Car,
   Calendar,
@@ -52,21 +52,32 @@ interface Pedido {
 }
 
 const statusConfig = {
-  INTRODUCED: { label: "Introduzido", color: "bg-yellow-400", icon: Clock },
-  UNDER_REVIEW: { label: "Em Análise", color: "bg-yellow-500", icon: AlertCircle },
+  INTRODUCED: { label: "Introduzido", color: "bg-primary", icon: Clock },
+  UNDER_REVIEW: { label: "Em Análise", color: "bg-primary", icon: AlertCircle },
   APPROVED: { label: "Aprovado", color: "bg-green-400", icon: CheckCircle },
   REJECTED: { label: "Rejeitado", color: "bg-red-500", icon: XCircle },
-  CANCELLED: { label: "Cancelado", color: "bg-slate-800/50 border border-slate-700/500", icon: XCircle },
+  CANCELLED: { label: "Cancelado", color: "bg-bg-card/50 border border-slate-700/500", icon: XCircle },
   COMPLETED: { label: "Concluído", color: "bg-purple-500", icon: CheckCircle },
 };
 
-export default function ReservasCliente() {
+export default function Pedidos() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
 
   useEffect(() => {
+    const storedUser = localStorage.getItem("vrumvrum_usuario");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      if (user.tipo !== "CLIENTE") {
+        window.location.href = "/";
+        return;
+      }
+    } else {
+      window.location.href = "/login?redirect=/pedidos";
+      return;
+    }
     fetchPedidos();
   }, []);
 
@@ -114,10 +125,10 @@ export default function ReservasCliente() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-800/50 border border-slate-700/50 flex items-center justify-center">
+      <div className="min-h-screen bg-bg-card/50 border border-slate-700/50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando suas reservas...</p>
+          <p className="mt-4 text-text-main/60">Carregando suas reservas...</p>
         </div>
       </div>
     );
@@ -125,13 +136,13 @@ export default function ReservasCliente() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-800/50 border border-slate-700/50 flex items-center justify-center">
+      <div className="min-h-screen bg-bg-card/50 border border-slate-700/50 flex items-center justify-center">
         <div className="text-center">
           <XCircle className="h-12 w-12 text-red-500 mx-auto" />
           <p className="mt-4 text-red-600">{error}</p>
           <button
             onClick={fetchPedidos}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="mt-4 px-4 py-2 bg-blue-600 text-text-main rounded-lg hover:bg-blue-700"
           >
             Tentar novamente
           </button>
@@ -141,21 +152,21 @@ export default function ReservasCliente() {
   }
 
     return (
-        <div className="min-h-screen bg-slate-950/90 backdrop-blur-md">
+        <div className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white">Minhas Reservas</h1>
-            <p className="mt-2 text-gray-300">Consulte o status das suas solicitações de aluguel</p>
+            <h1 className="text-3xl font-bold text-text-main">Minhas Reservas</h1>
+            <p className="mt-2 text-text-main/80">Consulte o status das suas solicitações de aluguel</p>
             </div>
 
             {pedidos.length === 0 ? (
             <div className="text-center py-12">
-                <Car className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">Nenhuma reserva encontrada</h3>
-                <p className="text-gray-600">Você ainda não fez nenhuma solicitação de aluguel.</p>
+                <Car className="h-16 w-16 text-text-main/70 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-text-main mb-2">Nenhuma reserva encontrada</h3>
+                <p className="text-text-main/60">Você ainda não fez nenhuma solicitação de aluguel.</p>
             </div>
             ) : (
-            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800 rounded-2xl shadow-xl">
+            <div className="bg-bg-card/40 backdrop-blur-md border border-slate-800 rounded-2xl shadow-xl">
                 <ul className="divide-y divide-gray-200">
                 {pedidos.map((pedido) => {
                     const statusInfo = statusConfig[pedido.status as keyof typeof statusConfig] || statusConfig.INTRODUCED;
@@ -166,24 +177,24 @@ export default function ReservasCliente() {
                         <div className="flex items-center gap-4">
                             <span className={`flex-shrink-0 w-3 h-3 rounded-full ${statusInfo.color}`}></span>
                             <div>
-                            <div className="flex items-center gap-2 text-sm text-white font-medium">
-                                <Car className="h-5 w-5 text-gray-400" />
+                            <div className="flex items-center gap-2 text-sm text-text-main font-medium">
+                                <Car className="h-5 w-5 text-text-main/70" />
                                 {pedido.veiculo.marca} {pedido.veiculo.modelo}
                             </div>
-                            <div className="text-sm text-gray-400 mt-1">
+                            <div className="text-sm text-text-main/70 mt-1">
                                 {pedido.veiculo.placa} • {formatDate(pedido.dataInicioDesejada)} - {formatDate(pedido.dataFimDesejada)}
                             </div>
                             </div>
                         </div>
                         <div className="flex flex-col sm:items-end gap-2">
-                            <div className="flex items-center gap-2 text-sm text-gray-400">
+                            <div className="flex items-center gap-2 text-sm text-text-main/70">
                             <StatusIcon className="h-4 w-4" />
                             <span>{statusInfo.label}</span>
                             </div>
-                            <div className="text-sm font-medium text-white">Reserva #{pedido.id}</div>
+                            <div className="text-sm font-medium text-text-main">Reserva #{pedido.id}</div>
                             <button
                             onClick={() => setSelectedPedido(pedido)}
-                            className="inline-flex items-center gap-1 px-3 py-1 border border-slate-700 rounded-md text-white bg-slate-800 hover:bg-slate-700 transition-colors"
+                            className="inline-flex items-center gap-1 px-3 py-1 border border-slate-700 rounded-md text-text-main bg-slate-800 hover:bg-slate-700 transition-colors"
                             >
                             <Eye className="h-4 w-4" />
                             Detalhes
@@ -202,12 +213,12 @@ export default function ReservasCliente() {
                 <div className="mt-20 w-full max-w-2xl rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-6">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                    <h2 className="text-xl font-semibold text-white">Detalhes da Reserva #{selectedPedido.id}</h2>
-                    <p className="text-sm text-gray-400">
+                    <h2 className="text-xl font-semibold text-text-main">Detalhes da Reserva #{selectedPedido.id}</h2>
+                    <p className="text-sm text-text-main/70">
                         Pedido de {formatDate(selectedPedido.dataInicioDesejada)} até {formatDate(selectedPedido.dataFimDesejada)}
                     </p>
                     </div>
-                    <button onClick={() => setSelectedPedido(null)} className="text-gray-400 hover:text-gray-700">
+                    <button onClick={() => setSelectedPedido(null)} className="text-text-main/70 hover:text-gray-700">
                     <XCircle className="h-6 w-6" />
                     </button>
                 </div>
@@ -219,17 +230,17 @@ export default function ReservasCliente() {
                     <span>{statusConfig[selectedPedido.status as keyof typeof statusConfig]?.label ?? selectedPedido.status}</span>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-bg-card/50 border border-slate-700/50 p-4 rounded-2xl">
                     <div>
-                        <h3 className="text-sm font-semibold text-white mb-2">Veículo</h3>
+                        <h3 className="text-sm font-semibold text-text-main mb-2">Veículo</h3>
                         <p className="text-sm text-gray-700">{selectedPedido.veiculo.marca} {selectedPedido.veiculo.modelo}</p>
-                        <p className="text-sm text-gray-400">Placa: {selectedPedido.veiculo.placa}</p>
-                        <p className="text-sm text-gray-400">Categoria: {selectedPedido.veiculo.categoria}</p>
+                        <p className="text-sm text-text-main/70">Placa: {selectedPedido.veiculo.placa}</p>
+                        <p className="text-sm text-text-main/70">Categoria: {selectedPedido.veiculo.categoria}</p>
                     </div>
                     <div>
-                        <h3 className="text-sm font-semibold text-white mb-2">Valor</h3>
+                        <h3 className="text-sm font-semibold text-text-main mb-2">Valor</h3>
 
-                        <p className="text-lg font-bold text-yellow-400">
+                        <p className="text-lg font-bold text-primary">
                             {formatCurrency(
                             (selectedPedido.veiculo.valorDia || 0) *
                             Math.ceil(
@@ -242,28 +253,28 @@ export default function ReservasCliente() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-bg-card/50 border border-slate-700/50 p-4 rounded-2xl">
                     <div>
-                        <span className="text-sm font-medium text-white">Início</span>
+                        <span className="text-sm font-medium text-text-main">Início</span>
                         <p className="text-sm text-gray-700">{formatDate(selectedPedido.dataInicioDesejada)}</p>
                     </div>
                     <div>
-                        <span className="text-sm font-medium text-white">Fim</span>
+                        <span className="text-sm font-medium text-text-main">Fim</span>
                         <p className="text-sm text-gray-700">{formatDate(selectedPedido.dataFimDesejada)}</p>
                     </div>
                     </div>
 
                     {selectedPedido.agente ? (
-                    <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-white mb-2">
+                    <div className="bg-bg-card/50 border border-slate-700/50 p-4 rounded-2xl">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-text-main mb-2">
                         <User className="h-5 w-5 text-gray-700" />
                         Agente responsável
                         </div>
                         <p className="text-sm text-gray-700">{selectedPedido.agente.nome}</p>
-                        <p className="text-sm text-gray-400">{selectedPedido.agente.email}</p>
+                        <p className="text-sm text-text-main/70">{selectedPedido.agente.email}</p>
                     </div>
                     ) : (
-                    <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-2xl text-yellow-300">
+                    <div className="bg-primary/10 border border-yellow-500/30 p-4 rounded-2xl text-primary">
                         <div className="flex items-center gap-2">
                         <AlertCircle className="h-5 w-5" />
                         Contrato ainda não foi gerado para esta reserva.
@@ -272,8 +283,8 @@ export default function ReservasCliente() {
                     )}
 
                     {selectedPedido.contrato && (
-                    <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-white mb-2">
+                    <div className="bg-bg-card/50 border border-slate-700/50 p-4 rounded-2xl">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-text-main mb-2">
                         <FileText className="h-5 w-5 text-gray-700" />
                         Contrato
                         </div>

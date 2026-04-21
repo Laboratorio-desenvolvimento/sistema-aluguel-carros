@@ -32,7 +32,7 @@ public class VeiculoService {
             } else if (mensagem.contains("placa") || mensagem.contains("PLACA")) {
                 throw new RuntimeException("Placa já cadastrada.");
             }
-            throw new RuntimeException("Dados duplicados: " + e.getMessage());
+            throw new RuntimeException("Já possui um veículo cadastrado com esses dados: " + e.getMessage());
         }
     }
 

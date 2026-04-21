@@ -44,9 +44,9 @@ const initialFormData: VeiculoFormData = {
 };
 
 const inputCls =
-  "w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500";
+  "w-full px-3 py-2 border border-slate-600 bg-bg-card/50 text-text-main placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50";
 
-const labelCls = "block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1";
+const labelCls = "block text-sm font-medium text-gray-200 mb-1";
 
 export default function CadastroVeiculo() {
   const [showForm, setShowForm] = useState(false);
@@ -158,7 +158,7 @@ export default function CadastroVeiculo() {
   return (
     <main className="flex-1 min-h-[calc(100vh-75px)] bg-slate-950/90 backdrop-blur-md py-10 px-4">
       <div className="mx-auto max-w-5xl">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-md dark:ring-1 dark:ring-slate-700 overflow-hidden">
+        <div className="bg-slate-900 rounded-2xl shadow-md ring-1 ring-slate-700 overflow-hidden">
           <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 px-6 py-5">
             <div className="flex items-center gap-3 text-black">
               <CarFront size={24} />
@@ -183,8 +183,8 @@ export default function CadastroVeiculo() {
             )}
 
             {!showForm && (
-              <div className="rounded-xl border border-dashed border-yellow-500/50 p-6 bg-yellow-50/30 dark:bg-slate-800/30 mb-5">
-                <p className="text-gray-700 dark:text-gray-200 mb-4">
+              <div className="rounded-xl border border-dashed border-yellow-500/50 p-6 bg-slate-800/30 mb-5">
+                <p className="text-gray-200 mb-4">
                   Comece adicionando um novo veículo para disponibilizar no catálogo da VrumVrum.
                 </p>
                 <button
@@ -194,7 +194,7 @@ export default function CadastroVeiculo() {
                     setSuccessMessage("");
                     setShowForm(true);
                   }}
-                  className="inline-flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-5 rounded-md transition-colors duration-200"
+                  className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-black font-bold py-2 px-5 rounded-md transition-colors duration-200"
                 >
                   <PlusCircle size={17} />
                   Criar veículo
@@ -294,7 +294,7 @@ export default function CadastroVeiculo() {
                 />
               </div>
 
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-200">
                 <input
                   type="checkbox"
                   name="destaque"
@@ -305,8 +305,8 @@ export default function CadastroVeiculo() {
                 Marcar veículo como destaque
               </label>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-gray-200 dark:border-slate-700 pt-5">
-                <div className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-slate-700 pt-5">
+                <div className="inline-flex items-center gap-2 text-sm text-gray-300">
                   <ShieldCheck size={16} className="text-yellow-500" />
                   O cadastro é enviado diretamente para o backend da plataforma.
                 </div>
@@ -318,14 +318,14 @@ export default function CadastroVeiculo() {
                       setShowForm(false);
                       setErrorMessage("");
                     }}
-                    className="inline-flex items-center justify-center border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-200 font-bold py-2 px-5 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors duration-200"
+                    className="inline-flex items-center justify-center border border-slate-600 text-gray-200 font-bold py-2 px-5 rounded-md hover:bg-slate-800 transition-colors duration-200"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="inline-flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-black font-bold py-2 px-5 rounded-md transition-colors duration-200"
+                    className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover disabled:opacity-50 text-black font-bold py-2 px-5 rounded-md transition-colors duration-200"
                   >
                     <PlusCircle size={17} />
                     {loading ? "Cadastrando..." : "Cadastrar veículo"}
