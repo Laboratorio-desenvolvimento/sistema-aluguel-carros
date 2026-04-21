@@ -36,7 +36,7 @@ export default function Home() {
             <Car size={18} /> Quero Alugar
           </a>
           <a
-            href="/dashboard-agente"
+            href="/app/routes/cadastro-veiculo"
             className="inline-flex items-center gap-2 ml-4 mt-4 sm:mt-0 font-bold py-3 px-8 rounded-lg border border-yellow-400 text-yellow-400 bg-transparent transition-colors duration-200"
           >
             <Briefcase size={18} /> Sou um agente
