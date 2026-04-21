@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { authService } from "~/services/auth.service";
+import { User, LogOut, LayoutDashboard, ChevronDown, ClipboardList } from "lucide-react";
 
 export default function Navbar() {
     const [user, setUser] = useState<{ id: number; nome: string; email: string; tipo: "CLIENTE" | "AGENTE" } | null>(null);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const token = authService.getToken();
@@ -10,9 +13,16 @@ export default function Navbar() {
         if (token && storedUser) {
             setUser(JSON.parse(storedUser));
         }
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
-
-
 
     const handleLogout = () => {
         authService.logout();
@@ -50,23 +60,70 @@ export default function Navbar() {
                             </a>
 
                             {user ? (
-                                <>
-                                    {user.tipo === "CLIENTE" ? (
-                                        <a href="/pedidos" className="text-text-main/80 hover:text-primary font-bold uppercase tracking-widest text-sm transition-colors">
-                                            Pedidos
-                                        </a>
-                                    ) : (
-                                        <a href="/dashboard" className="text-text-main/80 hover:text-primary font-bold uppercase tracking-widest text-sm transition-colors">
-                                            Dashboard
-                                        </a>
-                                    )}
-                                    <span className="text-primary font-bold tracking-widest text-sm border-l border-slate-700 pl-8">
+                                <div className="relative" ref={dropdownRef}>
+                                    <button
+                                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                        className="flex items-center gap-2 text-primary font-bold tracking-widest text-sm border-l border-slate-700 pl-8 cursor-pointer focus:outline-none"
+                                    >
                                         Olá, {user.nome.split(" ")[0]}
-                                    </span>
-                                    <button onClick={handleLogout} className="text-red-500 hover:text-red-600 font-bold uppercase tracking-widest text-sm transition-colors cursor-pointer">
-                                        Sair
+                                        <ChevronDown size={16} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                                     </button>
-                                </>
+
+                                    {isDropdownOpen && (
+                                        <div className="absolute right-0 mt-3 w-60 bg-bg-card border border-slate-700 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 z-[60] p-1.5">
+                                            <div className="px-4 py-3 mb-1.5 border-b border-slate-700/50">
+                                                <p className="text-[10px] text-text-main/40 font-black uppercase tracking-[0.2em] mb-0.5">Sua Conta</p>
+                                                <p className="text-sm text-text-main font-bold truncate">{user.nome}</p>
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <a
+                                                    href="/perfil"
+                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-text-main/80 hover:bg-primary/10 hover:text-primary rounded-xl transition-all duration-200 group"
+                                                >
+                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                                        <User size={16} />
+                                                    </div>
+                                                    <span className="font-semibold">Meu Perfil</span>
+                                                </a>
+
+                                                {user.tipo === "AGENTE" ? (
+                                                    <a
+                                                        href="/dashboard"
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-text-main/80 hover:bg-primary/10 hover:text-primary rounded-xl transition-all duration-200 group"
+                                                    >
+                                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                                            <LayoutDashboard size={16} />
+                                                        </div>
+                                                        <span className="font-semibold">Painel de Controle</span>
+                                                    </a>
+                                                ) : (
+                                                    <a
+                                                        href="/pedidos"
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-text-main/80 hover:bg-primary/10 hover:text-primary rounded-xl transition-all duration-200 group"
+                                                    >
+                                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                                            <ClipboardList size={16} />
+                                                        </div>
+                                                        <span className="font-semibold">Meus Pedidos</span>
+                                                    </a>
+                                                )}
+                                            </div>
+
+                                            <div className="mt-1.5 pt-1.5 border-t border-slate-700/50">
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-200 cursor-pointer group"
+                                                >
+                                                    <div className="w-8 h-8 rounded-lg bg-red-500/5 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                                                        <LogOut size={16} />
+                                                    </div>
+                                                    <span className="font-semibold">Sair da conta</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
                                 <>
                                     <a href="/login" className="text-text-main/80 hover:text-primary font-bold uppercase tracking-widest text-sm transition-colors border-l border-slate-700 pl-8">
@@ -79,7 +136,6 @@ export default function Navbar() {
                                 </>
                             )}
                         </div>
-
                     </div>
                 </div>
             </div>
