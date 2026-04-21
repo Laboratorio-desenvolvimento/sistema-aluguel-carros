@@ -64,9 +64,20 @@ public class AuthService {
     }
 
     private AuthResult gerarSessaoEToken(UsuarioSistema usuario) {
+        String role = "CLIENTE";
+        if (usuario instanceof Agente) {
+            role = "AGENTE";
+        } else if (usuario instanceof Cliente) {
+            role = "CLIENTE";
+        } else {
+            if (agenteService.listarTodos().stream().anyMatch(a -> a.getId().equals(usuario.getId()))) {
+                role = "AGENTE";
+            }
+        }
+
         Authentication authentication = Authentication.build(
                 usuario.getEmail(),
-                Collections.emptyList(),
+                Collections.singletonList(role),
                 Collections.singletonMap("userId", usuario.getId())
         );
         
@@ -85,8 +96,8 @@ public class AuthService {
         sessao.setValida(true);
         sessaoUsuarioRepository.save(sessao);
 
-        return new AuthResult(usuario, token);
+        return new AuthResult(usuario, token, role);
     }
 
-    public record AuthResult(UsuarioSistema usuario, String token) {}
+    public record AuthResult(UsuarioSistema usuario, String token, String tipo) {}
 }

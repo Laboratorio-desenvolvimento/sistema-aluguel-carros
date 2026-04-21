@@ -38,7 +38,7 @@ public class ClienteService {
             } else if (mensagem.contains("RG")) {
                 throw new RuntimeException("RG já cadastrado.");
             }
-            throw new RuntimeException("Dados duplicados.");
+            throw new RuntimeException("Já possui um usuário cadastrado com esses dados.");
         }
     }
 

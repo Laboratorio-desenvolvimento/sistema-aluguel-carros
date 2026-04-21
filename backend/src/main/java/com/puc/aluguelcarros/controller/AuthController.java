@@ -52,6 +52,7 @@ public class AuthController {
                 result.usuario().getNome(),
                 result.usuario().getEmail(),
                 result.token(),
+                result.tipo(),
                 mensagem
         );
     }
@@ -67,5 +68,5 @@ public class AuthController {
 
     @Introspected
     @Serdeable
-    public record AuthResponse(Long id, String nome, String email, String token, String mensagem) {}
+    public record AuthResponse(Long id, String nome, String email, String token, String tipo, String mensagem) {}
 }

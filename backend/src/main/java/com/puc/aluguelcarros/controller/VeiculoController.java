@@ -22,6 +22,7 @@ public class VeiculoController {
     }
 
     @Post
+    @Secured("AGENTE")
     @Status(HttpStatus.CREATED)
     public Veiculo criar(@Body Veiculo veiculo) {
         return veiculoService.salvar(veiculo);
@@ -34,12 +35,14 @@ public class VeiculoController {
     }
 
     @Delete("/{matricula}")
+    @Secured("AGENTE")
     @Status(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable String matricula) {
         veiculoService.deletar(matricula);
     }
 
     @Put("/{matricula}")
+    @Secured("AGENTE")
     @Status(HttpStatus.OK)
     public Veiculo atualizar(@PathVariable String matricula, @Body Veiculo veiculo) {
         return veiculoService.atualizar(matricula, veiculo);

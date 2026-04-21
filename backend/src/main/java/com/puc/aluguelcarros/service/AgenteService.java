@@ -36,7 +36,7 @@ public class AgenteService {
             } else if (mensagem.contains("email")) {
                 throw new RuntimeException("Email já cadastrado.");
             }
-            throw new RuntimeException("Dados duplicados.");
+            throw new RuntimeException("Já possui um usuário cadastrado com esses dados.");
         }
     }
 

@@ -10,6 +10,7 @@ export interface AuthResponse {
   nome: string;
   email: string;
   token: string;
+  tipo: "CLIENTE" | "AGENTE";
   mensagem: string;
 }
 

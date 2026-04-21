@@ -19,6 +19,7 @@ public class PedidoController {
     }
 
     @Get
+    @Secured("AGENTE")
     @Status(HttpStatus.OK)
     public HttpResponse<List<Pedido>> listar() {
         return pedidoFacace.listarTodos();
@@ -36,6 +37,7 @@ public class PedidoController {
     }
 
     @Post
+    @Secured("CLIENTE")
     @Status(HttpStatus.CREATED)
     public HttpResponse<Pedido> criarPedido(@Body Pedido pedido) {
         if (pedido.getCliente() == null || pedido.getCliente().getId() == null) {
@@ -46,7 +48,7 @@ public class PedidoController {
     }
 
     @Get("/cliente")
-    @Secured(SecurityRule.IS_AUTHENTICATED)
+    @Secured("CLIENTE")
     @Status(HttpStatus.OK)
     public HttpResponse<List<Pedido>> listarPedidosCliente(Authentication authentication) {
         try {
@@ -65,18 +67,21 @@ public class PedidoController {
     }
 
     @Put("/cancelar")
+    @Secured("CLIENTE")
     @Status(HttpStatus.OK)
     public HttpResponse<Pedido> cancelarPedido(@Body Pedido pedido) {
         return pedidoFacace.cancelarPedido(pedido);
     }
 
     @Put("/reprovar")
+    @Secured("AGENTE")
     @Status(HttpStatus.OK)
     public HttpResponse<Pedido> reprovarPedido(@Body Pedido pedido) {
         return pedidoFacace.reprovarPedido(pedido);
     }
 
     @Put("/executar")
+    @Secured("AGENTE")
     @Status(HttpStatus.OK)
     public HttpResponse<Pedido> executarPedido(@Body Pedido pedido) {
         return pedidoFacace.executarPedido(pedido);
