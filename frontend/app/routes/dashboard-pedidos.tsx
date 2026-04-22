@@ -51,16 +51,39 @@ export default function DashboardPedidos() {
   };
 
   const handleAprovar = async (pedido: Pedido) => {
-    try {
-        await api.put("/pedidos/executar", pedido);
-        fetchPedidos();
-        setModalPedido(null);
-    } catch(e) {
-        console.error(e);
-        alert("Erro ao aprovar o pedido.");
-    }
-  };
+  try {
+    const response = await api.put("/pedidos/executar", pedido);
 
+    console.log("Sucesso:", response.data);
+
+    fetchPedidos();
+    setModalPedido(null);
+  } catch (error: any) {
+    console.error("Erro completo:", error);
+
+    if (error.response) {
+      // Backend respondeu (erro 4xx ou 5xx)
+      console.error("Status:", error.response.status);
+      console.error("Dados:", error.response.data);
+
+      alert(
+        `Erro ${error.response.status}: ${
+          typeof error.response.data === "object"
+            ? JSON.stringify(error.response.data)
+            : error.response.data
+        }`
+      );
+    } else if (error.request) {
+      // Request foi feita mas não teve resposta (CORS, servidor off, etc)
+      console.error("Sem resposta:", error.request);
+      alert("Erro: sem resposta do servidor.");
+    } else {
+      // Erro ao montar a requisição
+      console.error("Erro:", error.message);
+      alert(`Erro: ${error.message}`);
+    }
+  }
+};
   const handleReprovar = async (pedido: Pedido) => {
     try {
         await api.put("/pedidos/reprovar", pedido);

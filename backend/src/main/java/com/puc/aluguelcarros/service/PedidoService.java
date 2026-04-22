@@ -6,6 +6,7 @@ import com.puc.aluguelcarros.model.Agente;
 import com.puc.aluguelcarros.model.Veiculo;
 import com.puc.aluguelcarros.model.UsuarioSistema;
 import com.puc.aluguelcarros.enums.StatusPedido;
+import com.puc.aluguelcarros.repository.ContratoRepository;
 import com.puc.aluguelcarros.repository.PedidoRepository;
 import com.puc.aluguelcarros.model.Contrato;
 import jakarta.persistence.PersistenceException;
@@ -21,6 +22,7 @@ import java.time.ZoneId;
 @Singleton
 public class PedidoService {
     private final PedidoRepository finalRepository;
+    private final ContratoRepository contratoRepository;
 
     @jakarta.inject.Inject
     private com.puc.aluguelcarros.repository.ClienteRepository clienteRepository;
@@ -31,8 +33,9 @@ public class PedidoService {
     @jakarta.inject.Inject
     private com.puc.aluguelcarros.repository.AgenteRepository agenteRepository;
 
-    public PedidoService(PedidoRepository repository) {
+    public PedidoService(PedidoRepository repository, ContratoRepository contratoRepository) {
         this.finalRepository = repository;
+        this.contratoRepository = contratoRepository;
     }
 
     public List<Pedido> listarTodos() {
@@ -136,10 +139,19 @@ public class PedidoService {
         if (pedido == null) {
             return HttpStatus.BAD_REQUEST;
         }
-        if (pedido.getStatus() != StatusPedido.UNDER_REVIEW) {
+        if (pedido.getStatus() != StatusPedido.UNDER_REVIEW && pedido.getStatus() != StatusPedido.PENDING) {
             return HttpStatus.BAD_REQUEST;
         }
         Contrato contrato = new Contrato();
+        contrato.setAgente(pedido.getAgente());
+        contrato.setVeiculo(pedido.getVeiculo());
+        contrato.setDataInicio(pedido.getDataInicioDesejada());
+        contrato.setDataFim(pedido.getDataFimDesejada());
+        double valorTotal = pedido.getVeiculo().getValorDia() * (pedido.getDataFimDesejada().getTime() - pedido.getDataInicioDesejada().getTime()) / (1000 * 60 * 60 * 24);
+        contrato.setValorTotal(valorTotal);
+
+        contrato = contratoRepository.save(contrato);
+
         pedido.setContrato(contrato);
         pedido.setStatus(StatusPedido.APPROVED);
         finalRepository.update(pedido);

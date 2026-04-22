@@ -63,4 +63,9 @@ public class AgenteService {
 
         return agenteRepository.update(existente);
     }
+
+    public Agente getById(Long id) {
+        return agenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Agente não encontrado."));
+    }
 }
