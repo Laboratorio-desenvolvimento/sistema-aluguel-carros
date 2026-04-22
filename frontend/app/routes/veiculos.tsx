@@ -14,7 +14,13 @@ import {
   X,
   XCircle,
   CheckCircle,
-  Calendar
+  Calendar,
+  Sun,
+  MapPin,
+  Bluetooth,
+  Settings,
+  Bell,
+  Video
 } from "lucide-react";
 import api from "~/services/api.service";
 
@@ -52,6 +58,13 @@ const itemIcon: Record<string, React.ReactNode> = {
   "Ar-condicionado": <Snowflake size={13} />,
   "Wi-Fi": <Wifi size={13} />,
   "Seguro incluso": <ShieldCheck size={13} />,
+  "Seguro": <ShieldCheck size={13} />,
+  "Teto Solar": <Sun size={13} />,
+  "GPS": <MapPin size={13} />,
+  "Bluetooth": <Bluetooth size={13} />,
+  "Dir. Hidráulica": <Settings size={13} />,
+  "Alarme": <Bell size={13} />,
+  "Câmera de Ré": <Video size={13} />,
 };
 
 export default function Veiculos() {
@@ -73,7 +86,12 @@ export default function Veiculos() {
     const params = inicio && fim ? { inicio, fim } : {};
     api.get("/veiculo", { params })
       .then((res) => {
-        setVeiculos(res.data);
+        const sorted = res.data.sort((a: Veiculo, b: Veiculo) => {
+          if (a.destaque && !b.destaque) return -1;
+          if (!a.destaque && b.destaque) return 1;
+          return 0;
+        });
+        setVeiculos(sorted);
         setLoading(false);
       })
       .catch((err) => {

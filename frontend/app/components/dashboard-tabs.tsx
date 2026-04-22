@@ -1,4 +1,4 @@
-import { LayoutDashboard, ClipboardList, FileText, History } from "lucide-react";
+import {LayoutDashboard, ClipboardList, FileText, History, Car} from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface TabProps {
@@ -8,6 +8,7 @@ interface TabProps {
 export default function DashboardTabs({ currentPath }: TabProps) {
   const tabs = [
     { label: "Início", path: "/dashboard", icon: LayoutDashboard },
+    { label: "Meus Veículos", path: "/dashboard/meus-veiculos", icon: Car},
     { label: "Pedidos", path: "/dashboard/pedidos", icon: ClipboardList },
     { label: "Contratos", path: "/dashboard/contratos", icon: FileText },
     { label: "Histórico", path: "/dashboard/history", icon: History },

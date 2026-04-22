@@ -28,6 +28,10 @@ public class VeiculoService {
         return veiculoRepository.findDisponiveis(inicio, fim, excludeId);
     }
 
+    public List<Veiculo> listarPorAgente(Long agenteId) {
+        return veiculoRepository.findAllByAgenteId(agenteId);
+    }
+
     @Transactional
     public Veiculo salvar(Veiculo veiculo) {
         try {

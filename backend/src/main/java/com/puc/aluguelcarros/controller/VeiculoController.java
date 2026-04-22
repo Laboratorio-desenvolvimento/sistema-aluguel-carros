@@ -43,6 +43,12 @@ public class VeiculoController {
         return veiculoService.listarTodos();
     }
 
+    @Get("/agente/{agenteId}")
+    @Status(HttpStatus.OK)
+    public List<Veiculo> listarPorAgente(@PathVariable Long agenteId) {
+        return veiculoService.listarPorAgente(agenteId);
+    }
+
     @Delete("/{matricula}")
     @Secured("AGENTE")
     @Status(HttpStatus.NO_CONTENT)

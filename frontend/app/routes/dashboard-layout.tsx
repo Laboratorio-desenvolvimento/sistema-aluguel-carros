@@ -37,11 +37,6 @@ export default function DashboardLayout() {
             </h1>
             <p className="text-text-main/60 mt-2 text-lg">Aqui está o resumo da sua operação hoje.</p>
           </div>
-          <div className="flex gap-4">
-            <a href="/cadastro-veiculo" className="bg-primary hover:bg-primary/90 text-black font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
-              <Zap size={18} /> Novo Veículo
-            </a>
-          </div>
         </div>
 
         <DashboardTabs currentPath={location.pathname} />
