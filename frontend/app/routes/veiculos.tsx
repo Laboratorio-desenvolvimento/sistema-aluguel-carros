@@ -23,6 +23,7 @@ import {
   Video
 } from "lucide-react";
 import api from "~/services/api.service";
+import { resolverFotoVeiculo } from "~/services/veiculo-foto.service";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -419,7 +420,7 @@ export default function Veiculos() {
               >
                 <div className="bg-bg-card h-44 flex items-center justify-center relative overflow-hidden">
                   {v.foto ? (
-                    <img src={v.foto.startsWith("data:") ? v.foto : `data:image/jpeg;base64,${v.foto}`} alt={`${v.marca} ${v.modelo}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <img src={resolverFotoVeiculo(v.foto) || undefined} alt={`${v.marca} ${v.modelo}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   ) : (
                     <Car size={80} className="text-text-main/10" />
                   )}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { 
   Car, 
-  Plus, 
   Search, 
   Edit2, 
   Trash2, 
@@ -9,11 +9,11 @@ import {
   TrendingUp,
   Fuel,
   Users,
-  Gauge,
   Star,
   Zap
 } from "lucide-react";
 import api from "~/services/api.service";
+import { resolverFotoVeiculo } from "~/services/veiculo-foto.service";
 
 interface Veiculo {
   id: number;
@@ -61,7 +61,7 @@ export default function DashboardVeiculos() {
   const handleDelete = async () => {
     if (!veiculoToDelete) return;
     try {
-      await api.delete(`/veiculo/${veiculoToDelete.matricula}`);
+      await api.delete(`/veiculo/${veiculoToDelete.id}`);
       setVeiculos(veiculos.filter(v => v.id !== veiculoToDelete.id));
       setDeleteModalOpen(false);
     } catch (error) {
@@ -137,7 +137,7 @@ export default function DashboardVeiculos() {
               <div className="h-44 bg-bg-card flex items-center justify-center relative overflow-hidden">
                 {v.foto ? (
                   <img 
-                    src={v.foto.startsWith("data:") ? v.foto : `data:image/jpeg;base64,${v.foto}`} 
+                    src={resolverFotoVeiculo(v.foto) || undefined}
                     alt={v.modelo}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
@@ -157,7 +157,7 @@ export default function DashboardVeiculos() {
                   )}
                 </div>
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 duration-300">
-                  <button className="w-10 h-10 bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center justify-center transition-colors"><Edit2 size={18} /></button>
+                  <Link to={`/dashboard/meus-veiculos/${v.id}/editar`} className="w-10 h-10 bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center justify-center transition-colors"><Edit2 size={18} /></Link>
                   <button 
                     onClick={() => { setVeiculoToDelete(v); setDeleteModalOpen(true); }}
                     className="w-10 h-10 bg-red-600 hover:bg-red-500 text-white rounded-lg flex items-center justify-center transition-colors"

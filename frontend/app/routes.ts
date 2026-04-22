@@ -6,6 +6,7 @@ export default [
   route("dashboard", "routes/dashboard-layout.tsx", [
     index("routes/dashboard-home.tsx"),
     route("meus-veiculos", "routes/dashboard-veiculos.tsx"),
+    route("meus-veiculos/:id/editar", "routes/editar-veiculo.tsx"),
     route("pedidos", "routes/dashboard-pedidos.tsx"),
     route("contratos", "routes/dashboard-contratos.tsx"),
     route("history", "routes/dashboard-history.tsx"),
