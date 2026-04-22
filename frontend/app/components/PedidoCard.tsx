@@ -119,7 +119,7 @@ export default function PedidoCard({ pedido, isSelected, onSelect, onRefresh, on
         setValidandoDisponibilidade(true);
         setErroDisponibilidade(null);
         try {
-          const res = await api.get("/veiculo", {
+            const res = await api.get("/veiculo", {
             params: { 
               inicio: editDataInicio, 
               fim: editDataFim,

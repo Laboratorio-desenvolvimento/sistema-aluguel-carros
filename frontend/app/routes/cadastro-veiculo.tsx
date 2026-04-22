@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Route } from "./+types/cadastro-veiculo";
 import { 
-  PlusCircle, 
-  ShieldCheck, 
   Image as ImageIcon, 
   Settings, 
   DollarSign, 
@@ -64,6 +62,8 @@ export default function CadastroVeiculo() {
   const [userId, setUserId] = useState<number | null>(null);
   const [uploadType, setUploadType] = useState<"url" | "file">("url");
   const [currentStep, setCurrentStep] = useState(1);
+  const [fotoArquivo, setFotoArquivo] = useState<File | null>(null);
+  const [fotoPreview, setFotoPreview] = useState("");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("vrumvrum_usuario");
@@ -84,7 +84,22 @@ export default function CadastroVeiculo() {
       setFormData((prev) => ({ ...prev, placa: value.toUpperCase() }));
       return;
     }
+    if (name === "foto") {
+      setFotoArquivo(null);
+      setFotoPreview(value);
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    setFotoArquivo(file);
+    setFormData((prev) => ({ ...prev, foto: "" }));
+    setFotoPreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,15 +108,32 @@ export default function CadastroVeiculo() {
     setSuccessMessage("");
     setLoading(true);
     try {
+      if (!userId) {
+        throw new Error("Agente não identificado.");
+      }
+
       const payload = {
         ...formData,
         ano: Number(formData.ano),
         lugares: Number(formData.lugares),
         valorDia: Number(formData.valorDia),
         avaliacao: Number(formData.avaliacao),
-        agente: { id: userId }
+        foto: uploadType === "url" ? formData.foto : "",
+        agenteId: userId,
       };
-      await api.post("/veiculo", payload);
+
+      const body = new FormData();
+      body.append("veiculo", JSON.stringify(payload));
+      if (uploadType === "file" && fotoArquivo) {
+        body.append("foto", fotoArquivo);
+      }
+
+      await api.post("/veiculo", body, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       setSuccessMessage("Veículo cadastrado com sucesso!");
       setTimeout(() => { window.location.href = "/dashboard/meus-veiculos"; }, 1500);
     } catch (error: any) {
@@ -134,6 +166,7 @@ export default function CadastroVeiculo() {
 
   const inputClasses = "w-full bg-slate-800/50 border border-slate-700 rounded-2xl py-4 px-6 text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/40 transition-all shadow-inner placeholder:text-gray-500 text-sm";
   const labelClasses = "block text-[10px] font-black uppercase tracking-[0.2em] text-text-main/60 mb-2 ml-1";
+  const previewImagem = uploadType === "file" ? fotoPreview : formData.foto;
 
   return (
     <main className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-bg-main">
@@ -222,24 +255,15 @@ export default function CadastroVeiculo() {
                       {uploadType === "url" ? (
                         <div className="relative">
                           <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                          <input name="foto" value={formData.foto.startsWith("data:") ? "" : formData.foto} onChange={handleChange} className={`${inputClasses} pl-11`} placeholder="Ex: https://img.com/..." />
+                          <input name="foto" value={formData.foto} onChange={handleChange} className={`${inputClasses} pl-11`} placeholder="Ex: https://img.com/..." />
                         </div>
                       ) : (
                         <div className="relative border-2 border-dashed border-slate-700/80 rounded-2xl bg-slate-800/30 hover:bg-slate-800/60 hover:border-primary/40 transition-all flex items-center justify-center cursor-pointer h-[52px]">
                           <span className="text-xs text-gray-400 font-semibold truncate px-4 flex items-center gap-2">
-                             <ImageIcon size={16} className={formData.foto.startsWith("data:") ? "text-green-500" : "text-gray-500"} /> 
-                             {formData.foto.startsWith("data:") ? "1 Imagem Carregada" : "Clique ou arraste a imagem"}
+                             <ImageIcon size={16} className={fotoArquivo ? "text-green-500" : "text-gray-500"} /> 
+                             {fotoArquivo ? "1 Imagem Carregada" : "Clique ou arraste a imagem"}
                           </span>
-                          <input type="file" accept="image/*" onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                setFormData(prev => ({ ...prev, foto: reader.result as string }));
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                          <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                         </div>
                       )}
                     </div>
@@ -311,7 +335,7 @@ export default function CadastroVeiculo() {
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-text-main/30 mb-8 italic">Digital Rendering</p>
                     <div className="bg-slate-900/60 rounded-[2.5rem] border border-slate-800 overflow-hidden shadow-2xl relative max-w-sm mx-auto text-left group transition-all duration-500 hover:border-primary/30">
                         <div className="h-56 bg-white/5 relative">
-                             {formData.foto ? <img src={formData.foto} alt="Preview" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" /> : <div className="w-full h-full flex items-center justify-center opacity-5"><Car size={100} /></div>}
+                              {previewImagem ? <img src={previewImagem} alt="Preview" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" /> : <div className="w-full h-full flex items-center justify-center opacity-5"><Car size={100} /></div>}
                              <div className="absolute top-6 left-6 flex gap-2">
                                 <span className="bg-black/60 backdrop-blur-md text-white text-[8px] font-black tracking-widest uppercase px-3 py-1.5 rounded-full border border-white/10">{formData.matricula || "MATR-000"}</span>
                                 {formData.destaque && <span className="bg-primary text-black text-[8px] font-black uppercase px-3 py-1.5 rounded-full flex items-center gap-1"><Star size={10} fill="black" /></span>}

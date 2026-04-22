@@ -1,6 +1,7 @@
 package com.puc.aluguelcarros.controller;
 
 import com.puc.aluguelcarros.model.Cliente;
+import com.puc.aluguelcarros.model.EntidadeEmpregadora;
 import com.puc.aluguelcarros.service.ClienteService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
@@ -43,6 +44,12 @@ public class ClienteController {
     @Status(HttpStatus.OK)
     public Cliente atualizar(@PathVariable String cpf, @Body Cliente cliente) {
         return clienteService.atualizar(cpf, cliente);
+    }
+
+    @Get("/{id}/empregadoras")
+    @Status(HttpStatus.OK)
+    public List<EntidadeEmpregadora> listarEmpregadoras(@PathVariable Long id) {
+        return clienteService.listarEmpregadoras(id);
     }
 
     @Error
