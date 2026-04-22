@@ -51,7 +51,7 @@ export default function Login() {
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email)) {
-      setErrorMessage("Email inválido.");
+      setErrorMessage("Email ou senha inválidos.");
       return false;
     }
 

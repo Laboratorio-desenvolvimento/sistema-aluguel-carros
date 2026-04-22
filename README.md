@@ -58,13 +58,25 @@ Desenvolver um software em Java utilizando Micronaut, para gerenciar pedidos e c
 │   │   ├── routes/            # Definição de rotas e páginas
 │   │   ├── services/          # Serviços de API e autenticação
 │   │   ├── welcome/           # Componentes de boas-vindas
-│   │   └── root.tsx           # Layout principal da aplicação
+│   │   ├── app.css            # Estilos globais
+│   │   ├── root.tsx           # Layout principal da aplicação
+│   │   └── routes.ts          # Configuração de rotas
 │   ├── public/                # Ativos estáticos (imagens, ícones)
 │   ├── package.json           # Dependências e scripts npm
+│   ├── tailwind.config.js     # Configuração do Tailwind CSS
 │   └── vite.config.ts         # Configuração do Vite
-├── docs/                      # Documentação UML e diagramas
+├── docs/                      # Documentação UML, diagramas e identidade visual
 └── README.md                  # Documentação principal do projeto
 ```
+
+## 🎨 Identidade Visual
+
+Para o desenvolvimento da interface, foi utilizada a paleta de cores:
+
+- **Color Hunt Palette**: [303841, 3a4750, f6c90e, eeeeee](https://colorhunt.co/palette/3038413a4750f6c90eeeeeee)
+
+![Paleta de Cores](docs/pallete.png)
+
 
 ## Instalacao e Execucao
 
