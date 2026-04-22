@@ -19,6 +19,14 @@ public class Cliente extends UsuarioSistema {
 
     private String profissao;
 
+    private String cep;
+    private String logradouro;
+    private String numero;
+    private String complemento;
+    private String bairro;
+    private String cidade;
+    private String estado;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(
             name = "cliente_empregadora",

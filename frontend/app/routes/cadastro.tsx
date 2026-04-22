@@ -17,6 +17,20 @@ interface ClienteFormData {
   rg: string;
   cpf: string;
   profissao: string;
+  cep: string;
+  logradouro: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  empregadoras: EmpregadoraFormData[];
+}
+
+interface EmpregadoraFormData {
+  nome: string;
+  cargo: string;
+  faixaRendaMensal: string;
 }
 
 interface AgenteFormData {
@@ -54,6 +68,12 @@ const formatCNPJ = (value: string) =>
     .replace(/(\d{4})(\d{1,2})/, "$1-$2")
     .slice(0, 18);
 
+const formatCEP = (value: string) =>
+  value
+    .replace(/\D/g, "")
+    .replace(/(\d{5})(\d)/, "$1-$2")
+    .slice(0, 9);
+
 const inputCls =
   "w-full px-3 py-2 border border-slate-600 bg-bg-card/50 text-text-main placeholder:text-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50";
 
@@ -69,6 +89,14 @@ export default function Cadastro() {
     rg: "",
     cpf: "",
     profissao: "",
+    cep: "",
+    logradouro: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+    empregadoras: [{ nome: "", cargo: "", faixaRendaMensal: "" }],
   });
 
   const [agenteData, setAgenteData] = useState<AgenteFormData>({
@@ -80,6 +108,7 @@ export default function Cadastro() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [loadingCep, setLoadingCep] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -88,7 +117,69 @@ export default function Cadastro() {
     let formatted = value;
     if (name === "cpf") formatted = formatCPF(value);
     else if (name === "rg") formatted = formatRG(value);
+    else if (name === "cep") formatted = formatCEP(value);
     setClienteData((prev) => ({ ...prev, [name]: formatted }));
+  };
+
+  const handleEmpregadoraChange = (
+    index: number,
+    field: keyof EmpregadoraFormData,
+    value: string
+  ) => {
+    setClienteData((prev) => {
+      const atualizadas = [...prev.empregadoras];
+      atualizadas[index] = { ...atualizadas[index], [field]: value };
+      return { ...prev, empregadoras: atualizadas };
+    });
+  };
+
+  const adicionarEmpregadora = () => {
+    setClienteData((prev) => ({
+      ...prev,
+      empregadoras: [...prev.empregadoras, { nome: "", cargo: "", faixaRendaMensal: "" }],
+    }));
+  };
+
+  const removerEmpregadora = (index: number) => {
+    setClienteData((prev) => {
+      if (prev.empregadoras.length === 1) {
+        return prev;
+      }
+      return {
+        ...prev,
+        empregadoras: prev.empregadoras.filter((_, i) => i !== index),
+      };
+    });
+  };
+
+  const buscarCep = async () => {
+    const cepNumerico = clienteData.cep.replace(/\D/g, "");
+    if (cepNumerico.length !== 8) {
+      return;
+    }
+
+    try {
+      setLoadingCep(true);
+      const response = await fetch(`https://viacep.com.br/ws/${cepNumerico}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        setErrorMessage("CEP não encontrado.");
+        return;
+      }
+
+      setClienteData((prev) => ({
+        ...prev,
+        logradouro: data.logradouro ?? "",
+        bairro: data.bairro ?? "",
+        cidade: data.localidade ?? "",
+        estado: data.uf ?? "",
+      }));
+    } catch {
+      setErrorMessage("Não foi possível consultar o CEP no momento.");
+    } finally {
+      setLoadingCep(false);
+    }
   };
 
   const handleAgenteChange = (
@@ -115,6 +206,23 @@ export default function Cadastro() {
       setErrorMessage("RG inválido. Use o formato: 00.000.000-0"); return false;
     }
     if (!clienteData.profissao) { setErrorMessage("O campo Profissão é obrigatório."); return false; }
+    if (!clienteData.cep || clienteData.cep.replace(/\D/g, "").length !== 8) {
+      setErrorMessage("O campo CEP é obrigatório e deve ter 8 dígitos."); return false;
+    }
+    if (!clienteData.logradouro) { setErrorMessage("O campo Logradouro é obrigatório."); return false; }
+    if (!clienteData.numero) { setErrorMessage("O campo Número é obrigatório."); return false; }
+    if (!clienteData.bairro) { setErrorMessage("O campo Bairro é obrigatório."); return false; }
+    if (!clienteData.cidade) { setErrorMessage("O campo Cidade é obrigatório."); return false; }
+    if (!clienteData.estado) { setErrorMessage("O campo Estado é obrigatório."); return false; }
+
+    const temEmpregadoraIncompleta = clienteData.empregadoras.some((e) =>
+      !e.nome.trim() || !e.cargo.trim() || !e.faixaRendaMensal.trim()
+    );
+    if (temEmpregadoraIncompleta) {
+      setErrorMessage("Preencha nome da empresa, cargo e faixa de renda em todos os vínculos empregatícios.");
+      return false;
+    }
+
     if (!clienteData.senha) { setErrorMessage("O campo Senha é obrigatório."); return false; }
     if (clienteData.senha.length < 6) {
       setErrorMessage("Senha muito curta. Use no mínimo 6 caracteres."); return false;
@@ -154,7 +262,14 @@ export default function Cadastro() {
       let payload;
 
       if (isCliente) {
-        payload = await authService.cadastrarCliente(clienteData);
+        payload = await authService.cadastrarCliente({
+          ...clienteData,
+          empregadoras: clienteData.empregadoras.map((e) => ({
+            nome: e.nome,
+            cargo: e.cargo,
+            faixaRendaMensal: e.faixaRendaMensal,
+          })),
+        });
       } else {
         payload = await authService.cadastrarAgente(agenteData);
       }
@@ -169,7 +284,22 @@ export default function Cadastro() {
       }));
       
       if (isCliente) {
-        setClienteData({ nome: "", email: "", senha: "", rg: "", cpf: "", profissao: "" });
+        setClienteData({
+          nome: "",
+          email: "",
+          senha: "",
+          rg: "",
+          cpf: "",
+          profissao: "",
+          cep: "",
+          logradouro: "",
+          numero: "",
+          complemento: "",
+          bairro: "",
+          cidade: "",
+          estado: "",
+          empregadoras: [{ nome: "", cargo: "", faixaRendaMensal: "" }],
+        });
       } else {
         setAgenteData({ nome: "", email: "", senha: "", cnpj: "", tipoAgente: "EMPRESA" });
       }
@@ -191,7 +321,7 @@ export default function Cadastro() {
 
   return (
     <div className="flex-1 flex items-center justify-center p-4 min-h-[calc(100vh-75px)] py-12">
-      <div className="w-full max-w-md bg-bg-card ring-1 ring-slate-700/50 rounded-lg shadow-md p-8">
+      <div className="w-full max-w-2xl bg-bg-card ring-1 ring-slate-700/50 rounded-lg shadow-md p-8">
         <h1 className="text-2xl font-bold text-text-main mb-6 text-center">
           Cadastro
         </h1>
@@ -297,6 +427,164 @@ export default function Cadastro() {
                   className={inputCls}
                   placeholder="Sua profissão"
                 />
+              </div>
+
+              <div className="pt-3 border-t border-slate-700/60">
+                <h3 className="text-sm font-semibold text-text-main mb-3">Endereço</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label htmlFor="cep" className={labelCls}>CEP</label>
+                    <input
+                      type="text"
+                      id="cep"
+                      name="cep"
+                      value={clienteData.cep}
+                      onChange={handleClienteChange}
+                      onBlur={buscarCep}
+                      maxLength={9}
+                      className={inputCls}
+                      placeholder="00000-000"
+                    />
+                    {loadingCep && <p className="text-xs text-text-main/60 mt-1">Consultando CEP...</p>}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label htmlFor="logradouro" className={labelCls}>Logradouro</label>
+                    <input
+                      type="text"
+                      id="logradouro"
+                      name="logradouro"
+                      value={clienteData.logradouro}
+                      onChange={handleClienteChange}
+                      className={inputCls}
+                      placeholder="Rua, avenida..."
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="numero" className={labelCls}>Número</label>
+                    <input
+                      type="text"
+                      id="numero"
+                      name="numero"
+                      value={clienteData.numero}
+                      onChange={handleClienteChange}
+                      className={inputCls}
+                      placeholder="123"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label htmlFor="complemento" className={labelCls}>Complemento</label>
+                    <input
+                      type="text"
+                      id="complemento"
+                      name="complemento"
+                      value={clienteData.complemento}
+                      onChange={handleClienteChange}
+                      className={inputCls}
+                      placeholder="Apto, bloco, referência"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="bairro" className={labelCls}>Bairro</label>
+                    <input
+                      type="text"
+                      id="bairro"
+                      name="bairro"
+                      value={clienteData.bairro}
+                      onChange={handleClienteChange}
+                      className={inputCls}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="cidade" className={labelCls}>Cidade</label>
+                    <input
+                      type="text"
+                      id="cidade"
+                      name="cidade"
+                      value={clienteData.cidade}
+                      onChange={handleClienteChange}
+                      className={inputCls}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="estado" className={labelCls}>Estado</label>
+                    <input
+                      type="text"
+                      id="estado"
+                      name="estado"
+                      value={clienteData.estado}
+                      onChange={handleClienteChange}
+                      maxLength={2}
+                      className={inputCls}
+                      placeholder="UF"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-700/60">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-text-main">Entidades empregadoras e rendimentos</h3>
+                  <button
+                    type="button"
+                    onClick={adicionarEmpregadora}
+                    className="text-xs px-2 py-1 rounded bg-primary text-black font-bold hover:bg-primary-hover"
+                  >
+                    + Adicionar
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {clienteData.empregadoras.map((empregadora, index) => (
+                    <div key={index} className="p-3 border border-slate-700 rounded-md bg-bg-card/40">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                          <label className={labelCls}>Nome da empresa</label>
+                          <input
+                            type="text"
+                            value={empregadora.nome}
+                            onChange={(e) => handleEmpregadoraChange(index, "nome", e.target.value)}
+                            className={inputCls}
+                          />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Cargo</label>
+                          <input
+                            type="text"
+                            value={empregadora.cargo}
+                            onChange={(e) => handleEmpregadoraChange(index, "cargo", e.target.value)}
+                            className={inputCls}
+                          />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Faixa renda mensal</label>
+                          <input
+                            type="text"
+                            value={empregadora.faixaRendaMensal}
+                            onChange={(e) => handleEmpregadoraChange(index, "faixaRendaMensal", e.target.value)}
+                            className={inputCls}
+                            placeholder="Ex: R$ 3.000 a R$ 5.000"
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-2 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => removerEmpregadora(index)}
+                          className="text-xs text-red-400 hover:text-red-300"
+                        >
+                          Remover vínculo
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </>
           )}

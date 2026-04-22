@@ -15,6 +15,8 @@ public class EntidadeEmpregadora {
     @Column(unique = true)
     private String cnpj;
     private Double rendimento;
+    private String cargo;
+    private String faixaRendaMensal;
 
 
 }
