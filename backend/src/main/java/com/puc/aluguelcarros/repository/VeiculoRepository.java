@@ -18,4 +18,6 @@ public interface VeiculoRepository extends CrudRepository<Veiculo, Long> {
             "AND (:excludeId IS NULL OR p.id <> :excludeId) " +
             "AND p.dataInicioDesejada <= :fim AND p.dataFimDesejada >= :inicio)")
     List<Veiculo> findDisponiveis(java.util.Date inicio, java.util.Date fim, @io.micronaut.core.annotation.Nullable Long excludeId);
+
+    List<Veiculo> findAllByAgenteId(Long agenteId);
 }
