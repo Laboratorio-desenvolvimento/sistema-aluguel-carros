@@ -138,4 +138,4 @@ Para o desenvolvimento da interface, foi utilizada a paleta de cores:
 
 ## Licenca
 
-Definir a licenca oficial do projeto.
+Definir a licenca oficial do projeto
